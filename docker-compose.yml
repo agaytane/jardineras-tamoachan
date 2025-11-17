@@ -1,0 +1,45 @@
+services:
+  web:
+    build: .
+    container_name: web
+    ports:
+      - "8080:80"
+    volumes:
+      - ./src:/var/www/html
+    depends_on:
+      - sqlserver
+    networks:
+      - devnet
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    restart: always
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "Admin123!"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+    networks:
+      - devnet
+
+  adminer:
+    image: adminer
+    container_name: adminer
+    restart: always
+    environment:
+      ADMINER_DEFAULT_DRIVER: sqlsrv
+    ports:
+      - "8081:8080"
+    depends_on:
+      - sqlserver
+    networks:
+      - devnet
+
+networks:
+  devnet:
+
+volumes:
+  sql_data:
