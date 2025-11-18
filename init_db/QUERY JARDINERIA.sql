@@ -1,5 +1,5 @@
-CREATE DATABASE AGE_JARDINES_TAMOANCHAN;
-USE AGE_JARDINES_TAMOANCHAN;
+CREATE DATABASE JARDINES_TAMOANCHAN;
+USE JARDINES_TAMOANCHAN;
 
 CREATE TABLE OFICINA (
     Id_oficina INT PRIMARY KEY,
@@ -42,6 +42,14 @@ CREATE TABLE PEDIDO (
     Fk_id_empleado INT FOREIGN KEY REFERENCES EMPLEADO(Id_empleado)
 )
 GO
+
+CREATE TABLE GAMA_PRODUCTO(
+    Id_gama INT PRIMARY KEY,
+    Nombre_gama VARCHAR(20),
+    Descripcion_gama VARCHAR(30)
+)
+GO
+
 CREATE TABLE PRODUCTO (
     Id_producto INT PRIMARY KEY,
     Nombre VARCHAR(20),
@@ -49,13 +57,6 @@ CREATE TABLE PRODUCTO (
     Precio_venta DECIMAL(10,2),
     Stock INT,
     Fk_id_gama INT FOREIGN KEY REFERENCES GAMA_PRODUCTO(Id_gama)  
-)
-GO
-
-CREATE TABLE GAMA_PRODUCTO(
-    Id_gama INT PRIMARY KEY,
-    Nombre_gama VARCHAR(20),
-    Descripcion_gama VARCHAR(30)
 )
 GO
 
@@ -116,4 +117,35 @@ INSERT INTO DETALLE_PEDIDO (Fk_id_pedido, Fk_id_producto, Cantidad) VALUES
 (3, 3, 1),
 (4, 4, 5),
 (5, 5, 1);
+
+CREATE VIEW Vista_Empleados AS
+SELECT 
+    e.Nombre_emp, 
+    e.Apellido_emp, 
+    e.Email_emp,
+    o.Ciudad, 
+    o.Provincia
+FROM EMPLEADO e
+JOIN OFICINA o 
+    ON e.Fk_id_oficina = o.Id_oficina;
+
+SELECT * FROM Vista_Empleados;    
+
+CREATE VIEW Vista_Detalle_Pedidos AS
+SELECT 
+    dp.Fk_id_pedido AS Id_pedido,
+    p.Fecha_pedido,
+    c.Nombre_cte + ' ' + c.Apellido_cte AS Cliente,
+    e.Nombre_emp + ' ' + e.Apellido_emp AS Empleado,
+    pr.Nombre AS Producto,
+    dp.Unit_price,
+    dp.Cantidad,
+    dp.Subtotal
+FROM DETALLE_PEDIDO dp
+JOIN PEDIDO p ON dp.Fk_id_pedido = p.Id_pedido
+JOIN CLIENTE c ON p.Fk_id_cliente = c.Id_cliente
+JOIN EMPLEADO e ON p.Fk_id_empleado = e.Id_empleado
+JOIN PRODUCTO pr ON dp.Fk_id_producto = pr.Id_producto;
+
+SELECT * FROM Vista_Detalle_Pedidos;
 

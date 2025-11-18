@@ -1,25 +1,19 @@
 <?php
-
-$server   = "sqlserver";   // nombre del contenedor o servidor
-$port     = "1433";        // puerto de SQL Server
-$db       = "AGE_JARDINES_TAMOANCHAN";
+$serverName = "sqlserver";
+$port = "1433";
+$db = "JARDINES_TAMOANCHAN";
 $username = "sa";
 $password = "Admin123!";
 
 try {
     $conn = new PDO(
-        "sqlsrv:Server=$server,$port;Database=$db;Encrypt=no;TrustServerCertificate=yes;",
+        "sqlsrv:Server=$serverName,$port;Database=$db;Encrypt=no;TrustServerCertificate=yes;",
         $username,
         $password
     );
 
-    // Activar errores
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    echo "Conectado correctamente a SQL Server";
-
 } catch (PDOException $e) {
-    echo "Error de conexión: " . $e->getMessage();
+    die("Error en la conexión a SQL Server: " . $e->getMessage());
 }
-
-?>
