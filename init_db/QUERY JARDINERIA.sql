@@ -65,3 +65,55 @@ CREATE TABLE DETALLE_PEDIDO(
     Cantidad INT
 ) 
 GO
+
+INSERT INTO GAMA_PRODUCTO (Id_gama, Nombre_gama, Descripcion_gama) VALUES
+(1, 'Oficina', 'Artículos de oficina'),
+(2, 'Electrónica', 'Productos electrónicos'),
+(3, 'Hogar', 'Accesorios del hogar'),
+(4, 'Escolar', 'Material escolar'),
+(5, 'Computo', 'Accesorios de computación');
+
+INSERT INTO OFICINA (Id_oficina, Direccion, Telefono, Ciudad, Provincia, Codigo_postal) VALUES
+(1, 'Av Reforma 100', '5551234567', 'CDMX', 'CDMX', '01000'),
+(2, 'Calle Norte 50', '5559876543', 'Monterrey', 'NL', '64000'),
+(3, 'Centro 22', '5548761234', 'Guadalajara', 'JAL', '44100'),
+(4, 'Av Sur 350', '5557654321', 'Puebla', 'PUE', '72000'),
+(5, 'Calle 16', '5554442211', 'Toluca', 'MEX', '50000');
+
+INSERT INTO EMPLEADO (Id_empleado, Nombre_emp, Apellido_emp, Email_emp, Telefono_emp, Puesto, Salario, Nombre_jefe, Fk_id_oficina) VALUES
+(1, 'Juan', 'Perez', 'juan@empresa.com', '5512345678', 'Gerente', 25000.00, 'N/A', 1),
+(2, 'Ana', 'Lopez', 'ana@empresa.com', '5598765432', 'Vendedor', 15000.00, 'Juan Perez', 1),
+(3, 'Luis', 'Gomez', 'luis@empresa.com', '5511122233', 'Vendedor', 14000.00, 'Juan Perez', 2),
+(4, 'Maria', 'Soto', 'maria@empresa.com', '5588877766', 'Asistente', 12000.00, 'Ana Lopez', 3),
+(5, 'Pedro', 'Ruiz', 'pedro@empresa.com', '5577766655', 'Repartidor', 10000.00, 'Luis Gomez', 4);
+
+
+INSERT INTO CLIENTE (Id_cliente, Nombre_cte, Apellido_cte, Email_cte, Telefono_cte, Direccion_cte) VALUES
+(1, 'Carlos', 'Mena', 'carlos@gmail.com', '5512340000', 'Calle 1'),
+(2, 'Laura', 'Diaz', 'laura@gmail.com', '5523451111', 'Calle 2'),
+(3, 'Diego', 'Santos', 'diego@gmail.com', '5534562222', 'Calle 3'),
+(4, 'Sofia', 'Vega', 'sofia@gmail.com', '5545673333', 'Calle 4'),
+(5, 'Bruno', 'Reyes', 'bruno@gmail.com', '5556784444', 'Calle 5');
+
+INSERT INTO PRODUCTO (Id_producto, Nombre, Descripcion, Precio_venta, Stock, Fk_id_gama) VALUES
+(1, 'Laptop', 'Laptop 14 pulgadas', 15000.00, 10, 5),
+(2, 'Mouse', 'Mouse inalámbrico', 250.00, 50, 5),
+(3, 'Escritorio', 'Escritorio madera', 3500.00, 5, 1),
+(4, 'Cuaderno', 'Cuaderno rayado', 40.00, 100, 4),
+(5, 'Audífonos', 'Audífonos bluetooth', 700.00, 20, 2);
+
+INSERT INTO PEDIDO (Id_pedido, Fecha_pedido, Fecha_prevista, Fecha_entrega, Estado, Comentarios, Fk_id_cliente, Fk_id_empleado) VALUES
+(1, '2025-01-10', '2025-01-15', NULL, 'Pendiente', 'Entrega estándar', 1, 2),
+(2, '2025-01-12', '2025-01-18', NULL, 'Pendiente', 'Revisión de stock', 2, 3),
+(3, '2025-01-13', '2025-01-20', NULL, 'Pendiente', 'Urgente', 3, 1),
+(4, '2025-01-14', '2025-01-19', NULL, 'Pendiente', 'Cliente frecuente', 4, 4),
+(5, '2025-01-15', '2025-01-22', NULL, 'Pendiente', 'Pago en efectivo', 5, 5);
+
+
+INSERT INTO DETALLE_PEDIDO (Fk_id_pedido, Fk_id_producto, Cantidad) VALUES
+(1, 1, 1),
+(2, 2, 2),
+(3, 3, 1),
+(4, 4, 5),
+(5, 5, 1);
+
