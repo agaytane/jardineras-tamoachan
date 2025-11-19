@@ -2,9 +2,6 @@
 // 1. Cargar la conexión PDO ya creada en database.php
 require_once __DIR__ . '/config/database.php';
 
-// 2. Cargar controladores
-require_once __DIR__ . '/controllers/Ctrl_Empl.php';
-
 // 3. Obtener URL amigable
 $url = isset($_GET['url']) ? filter_var(trim($_GET['url'], '/'), FILTER_SANITIZE_URL) : '';
 $partes = explode('/', $url);
@@ -17,8 +14,14 @@ switch ($accion) {
 
     case 'INICIO':
     case 'EMPLEADOS':
-        // $conn viene directamente de database.php
+        require_once __DIR__ . '/controllers/Ctrl_Empl.php';
         $controller = new EmpleadoController($conn);
+        $controller->index();
+        break;
+        
+    case 'DETALLES_PEDIDO':
+        require_once __DIR__ . '/controllers/Ctrl_Dpedidos.php';
+        $controller = new DpedidosController($conn);
         $controller->index();
         break;
 

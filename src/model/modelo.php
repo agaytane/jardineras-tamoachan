@@ -22,3 +22,18 @@ class Producto {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
+
+class VistaPedidos {
+    private $conn;
+
+    public function __construct($conn) {
+        $this->conn = $conn;
+    }
+
+    public function obtenerDetalles() {
+        $sql = "SELECT * FROM Vista_Detalle_Pedidos;";
+        $stmt = $this->conn->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+}
+?>

@@ -118,34 +118,33 @@ INSERT INTO DETALLE_PEDIDO (Fk_id_pedido, Fk_id_producto, Cantidad) VALUES
 (4, 4, 5),
 (5, 5, 1);
 
-CREATE VIEW Vista_Empleados AS
-SELECT 
-    e.Nombre_emp, 
-    e.Apellido_emp, 
-    e.Email_emp,
-    o.Ciudad, 
-    o.Provincia
-FROM EMPLEADO e
-JOIN OFICINA o 
-    ON e.Fk_id_oficina = o.Id_oficina;
 
-SELECT * FROM Vista_Empleados;    
 
 CREATE VIEW Vista_Detalle_Pedidos AS
-SELECT 
+SELECT
     dp.Fk_id_pedido AS Id_pedido,
     p.Fecha_pedido,
+    p.Estado,
     c.Nombre_cte + ' ' + c.Apellido_cte AS Cliente,
     e.Nombre_emp + ' ' + e.Apellido_emp AS Empleado,
-    pr.Nombre AS Producto,
-    dp.Unit_price,
-    dp.Cantidad,
-    dp.Subtotal
-FROM DETALLE_PEDIDO dp
-JOIN PEDIDO p ON dp.Fk_id_pedido = p.Id_pedido
-JOIN CLIENTE c ON p.Fk_id_cliente = c.Id_cliente
-JOIN EMPLEADO e ON p.Fk_id_empleado = e.Id_empleado
-JOIN PRODUCTO pr ON dp.Fk_id_producto = pr.Id_producto;
 
-SELECT * FROM Vista_Detalle_Pedidos;
+    pr.Nombre AS Producto,
+    pr.Precio_venta AS PrecioUnitario,
+    dp.Cantidad,
+    (dp.Cantidad * pr.Precio_venta) AS Subtotal,
+
+    -- TOTAL DEL PEDIDO USANDO VENTANA
+    SUM(dp.Cantidad * pr.Precio_venta)
+        OVER(PARTITION BY dp.Fk_id_pedido) AS Total_Pedido
+
+FROM DETALLE_PEDIDO dp
+JOIN PEDIDO p 
+    ON dp.Fk_id_pedido = p.Id_pedido
+JOIN CLIENTE c 
+    ON p.Fk_id_cliente = c.Id_cliente
+JOIN EMPLEADO e 
+    ON p.Fk_id_empleado = e.Id_empleado
+JOIN PRODUCTO pr 
+    ON dp.Fk_id_producto = pr.Id_producto;
+
 

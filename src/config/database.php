@@ -17,3 +17,4 @@ try {
 } catch (PDOException $e) {
     die("Error en la conexión a SQL Server: " . $e->getMessage());
 }
+
