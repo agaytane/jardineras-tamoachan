@@ -1,6 +1,5 @@
 CREATE DATABASE JARDINES_TAMOANCHAN;
-USE JARDINES_TAMOANCHAN;
-
+USE JARD
 CREATE TABLE OFICINA (
     Id_oficina INT PRIMARY KEY,
     Direccion VARCHAR(35),
@@ -120,6 +119,7 @@ INSERT INTO DETALLE_PEDIDO (Fk_id_pedido, Fk_id_producto, Cantidad) VALUES
 
 
 
+GO
 CREATE VIEW Vista_Detalle_Pedidos AS
 SELECT
     dp.Fk_id_pedido AS Id_pedido,
@@ -132,8 +132,6 @@ SELECT
     pr.Precio_venta AS PrecioUnitario,
     dp.Cantidad,
     (dp.Cantidad * pr.Precio_venta) AS Subtotal,
-
-    -- TOTAL DEL PEDIDO USANDO VENTANA
     SUM(dp.Cantidad * pr.Precio_venta)
         OVER(PARTITION BY dp.Fk_id_pedido) AS Total_Pedido
 
@@ -146,5 +144,86 @@ JOIN EMPLEADO e
     ON p.Fk_id_empleado = e.Id_empleado
 JOIN PRODUCTO pr 
     ON dp.Fk_id_producto = pr.Id_producto;
+
+GO
+CREATE PROCEDURE SP_INSERTAR_PRODUCTO
+    @Id_producto INT,
+    @Nombre VARCHAR(20),
+    @Descripcion VARCHAR(20),
+    @Precio_venta DECIMAL(10,2),
+    @Stock INT,
+    @Fk_id_gama INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    INSERT INTO PRODUCTO (
+        Id_producto,
+        Nombre,
+        Descripcion,
+        Precio_venta,
+        Stock,
+        Fk_id_gama
+     
+    )
+    VALUES (
+        @Id_producto,
+        @Nombre,
+        @Descripcion,
+        @Precio_venta,
+        @Stock,
+        @Fk_id_gama
+    );
+END;
+
+GO
+
+CREATE PROCEDURE SP_ACTUALIZAR_PRODUCTO
+    @Id_producto INT,
+    @Nombre VARCHAR(20),
+    @Descripcion VARCHAR(20),
+    @Precio_venta DECIMAL(10,2),
+    @Stock INT,
+    @Fk_id_gama INT
+AS
+BEGIN
+        UPDATE PRODUCTO
+        SET Nombre = @Nombre,
+            Descripcion = @Descripcion,
+            Precio_venta = @Precio_venta,
+            Stock = @Stock,
+            Fk_id_gama = @Fk_id_gama
+        WHERE Id_producto = @Id_producto;
+END;
+GO
+
+CREATE PROCEDURE SP_ELIMINAR_PRODUCTO
+    @Id_producto INT
+AS
+BEGIN
+    DELETE FROM PRODUCTO WHERE Id_producto = @Id_producto;
+END;
+GO
+
+CREATE PROCEDURE SP_LISTAR_PRODUCTOS
+AS
+BEGIN
+    SELECT 
+        Id_producto,
+        Nombre,
+        Descripcion,
+        Precio_venta,
+        Stock,
+        Fk_id_gama    
+    FROM PRODUCTO;
+END;
+
+GO
+
+CREATE PROCEDURE SP_OBTENER_PRODUCTO
+    @Id_producto INT
+AS
+BEGIN
+    SELECT * FROM PRODUCTO WHERE Id_producto = @Id_producto;
+END;
 
 
