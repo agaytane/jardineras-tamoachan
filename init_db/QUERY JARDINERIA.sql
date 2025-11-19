@@ -117,8 +117,91 @@ INSERT INTO DETALLE_PEDIDO (Fk_id_pedido, Fk_id_producto, Cantidad) VALUES
 (4, 4, 5),
 (5, 5, 1);
 
+--5 Vistas
+
+--VISTA PEDIDO CON CLIENTE Y EMPLEADO
+CREATE VIEW AGE_V_PEDIDO_CLIENTE_EMPLEADO AS
+SELECT 
+    p.Id_pedido,
+    p.Fecha_pedido,
+    c.Nombre_cte + ' ' + c.Apellido_cte AS Cliente,
+    e.Nombre_emp + ' ' + e.Apellido_emp AS Empleado
+FROM PEDIDO p, CLIENTE c, EMPLEADO e
+WHERE p.Fk_id_cliente = c.Id_cliente
+  AND p.Fk_id_empleado = e.Id_empleado;
+
+  SELECT * FROM AGE_V_PEDIDO_CLIENTE_EMPLEADO;
+
+--VISTA PRODUCTO CON GAMA Y DETALLE PEDIDO
+CREATE VIEW AGE_V_PRODUCTO_GAMA_DETALLE AS
+SELECT 
+    pr.Id_producto,
+    pr.Nombre AS Producto,
+    g.Nombre_gama AS Gama,
+    dp.Cantidad
+FROM PRODUCTO pr, GAMA_PRODUCTO g, DETALLE_PEDIDO dp
+WHERE pr.Fk_id_gama = g.Id_gama
+  AND dp.Fk_id_producto = pr.Id_producto;
+
+--VISTA DETALLE PEDIDO CON INFORMACION ADICIONAL
+CREATE VIEW AGE_V_DETALLE_PEDIDO_INFO AS
+SELECT 
+    dp.Fk_id_pedido AS Pedido,
+    dp.Fk_id_producto AS Producto,
+    pr.Nombre AS Nombre_producto,
+    dp.Cantidad,
+    p.Fecha_pedido
+FROM DETALLE_PEDIDO dp, PEDIDO p, PRODUCTO pr
+WHERE dp.Fk_id_pedido = p.Id_pedido
+  AND dp.Fk_id_producto = pr.Id_producto;
 
 
+--VISTA EMPLEADO CON OFICINA Y PEDIDOS
+CREATE VIEW AGE_V_EMPLEADO_OFICINA_PEDIDOS AS
+SELECT 
+    e.Id_empleado,
+    e.Nombre_emp + ' ' + e.Apellido_emp AS Empleado,
+    o.Ciudad AS Oficina,
+    p.Id_pedido
+FROM EMPLEADO e, OFICINA o, PEDIDO p
+WHERE e.Fk_id_oficina = o.Id_oficina
+  AND p.Fk_id_empleado = e.Id_empleado;
+
+--VISTA CLIENTE CON PEDIDOS Y PRODUCTOS
+CREATE VIEW AGE_V_CLIENTE_PEDIDO_PRODUCTOS AS
+SELECT 
+    c.Id_cliente,
+    c.Nombre_cte + ' ' + c.Apellido_cte AS Cliente,
+    p.Id_pedido,
+    dp.Fk_id_producto AS Producto,
+    dp.Cantidad
+FROM CLIENTE c, PEDIDO p, DETALLE_PEDIDO dp
+WHERE p.Fk_id_cliente = c.Id_cliente
+  AND dp.Fk_id_pedido = p.Id_pedido;
+
+--INDEXES
+CREATE INDEX IDX_PRODUCTO_NOMBRE ON PRODUCTO (Nombre);
+CREATE INDEX IDX_PRODUCTO_GAMA ON PRODUCTO (Fk_id_gama);
+
+CREATE INDEX IDX_CLIENTE_EMAIL ON CLIENTE (Email_cte);
+CREATE INDEX IDX_CLIENTE_NOMBRE ON CLIENTE (Nombre_cte, Apellido_cte);
+
+CREATE INDEX IDX_PEDIDO_FECHA ON PEDIDO (Fecha_pedido);
+CREATE INDEX IDX_PEDIDO_ESTADO ON PEDIDO (Estado);
+CREATE INDEX IDX_PEDIDO_CLIENTE ON PEDIDO (Fk_id_cliente);
+CREATE INDEX IDX_PEDIDO_EMPLEADO ON PEDIDO (Fk_id_empleado);
+
+CREATE INDEX IDX_DP_PEDIDO ON DETALLE_PEDIDO (Fk_id_pedido);
+CREATE INDEX IDX_DP_PRODUCTO ON DETALLE_PEDIDO (Fk_id_producto);
+
+CREATE INDEX IDX_EMPLEADO_NOMBRE ON EMPLEADO (Nombre_emp, Apellido_emp);
+CREATE INDEX IDX_EMPLEADO_OFICINA ON EMPLEADO (Fk_id_oficina);
+
+CREATE INDEX IDX_OFICINA_CIUDAD ON OFICINA (Ciudad);
+CREATE INDEX IDX_OFICINA_PROVINCIA ON OFICINA (Provincia);
+
+
+--WEB
 GO
 CREATE VIEW Vista_Detalle_Pedidos AS
 SELECT

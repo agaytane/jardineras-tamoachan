@@ -30,7 +30,6 @@ class ProductModel {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /* OBTENER UNO POR ID */
     public function obtener($id) {
         $sql = "EXEC SP_OBTENER_PRODUCTO :id";
         $stmt = $this->conn->prepare($sql);
@@ -39,7 +38,6 @@ class ProductModel {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    /* INSERTAR */
     public function insertar($data) {
         $sql = "EXEC SP_INSERTAR_PRODUCTO 
                 :id, :nom, :des, :precio, :stock, :gama";
@@ -56,7 +54,6 @@ class ProductModel {
         return $stmt->execute();
     }
 
-    /* ACTUALIZAR */
     public function actualizar($data) {
         $sql = "EXEC SP_ACTUALIZAR_PRODUCTO 
                 :id, :nom, :des, :precio, :stock, :gama";
@@ -81,10 +78,6 @@ class ProductModel {
         return $stmt->execute();
     }
 }
-
-/* ==========================================================
-   VISTA DETALLE PEDIDOS
-   ========================================================== */
 
 class VistaPedidos {
     private $conn;
