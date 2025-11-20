@@ -1,148 +1,95 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="utf-8" />
-    <title>Detalle de Pedidos — Vista</title>
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <style>
-        :root{
-            --bg:#f6f7fb;
-            --card:#fff;
-            --muted:#666;
-            --accent:#2b7cff;
-            --border:#e1e6ef;
-        }
-        body{
-            margin:0;
-            font-family: Inter, system-ui, Arial, sans-serif;
-            background:var(--bg);
-            color:#222;
-        }
-        .container{
-            max-width:1200px;
-            margin:28px auto;
-            padding:18px;
-        }
-        header{
-            display:flex;
-            align-items:center;
-            justify-content:space-between;
-            gap:12px;
-            margin-bottom:18px;
-        }
-        h1{ margin:0; font-size:20px; }
-        .card{
-            background:var(--card);
-            border:1px solid var(--border);
-            border-radius:10px;
-            padding:14px;
-            box-shadow: 0 6px 18px rgba(30,40,80,0.03);
-        }
-        table{
-            width:100%;
-            border-collapse:collapse;
-            font-size:14px;
-        }
-        thead th{
-            text-align:left;
-            padding:10px 12px;
-            background:linear-gradient(180deg,#fbfdff,#f3f7ff);
-            border-bottom:1px solid var(--border);
-            position:sticky;
-            top:0;
-            z-index:2;
-        }
-        tbody td{
-            padding:10px 12px;
-            border-bottom:1px dashed #eee;
-            vertical-align:middle;
-        }
-        tbody tr:nth-child(even){ background:#fcfdff; }
-        .right{ text-align:right; }
-        .muted{ color:var(--muted); font-size:13px; }
-        .tot-row td{
-            border-top:2px solid #ddd;
-            font-weight:600;
-            background:#fafbff;
-        }
-        .empty{
-            padding:28px;
-            text-align:center;
-            color:var(--muted);
-        }
-        .small{
-            font-size:13px;
-            color:var(--muted);
-        }
-        /* responsive */
-        @media (max-width:900px){
-            thead th:nth-child(3), td:nth-child(3),
-            thead th:nth-child(4), td:nth-child(4),
-            thead th:nth-child(8), td:nth-child(8) { display:none; }
-        }
-    </style>
-</head>
-<body>
-<div class="container">
-    <header>
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Detalle de Pedidos</h1>
-        <div class="small">Vista: <strong>Vista_Detalle_Pedidos</strong></div>
-    </header>
+        <small>Vista: <strong>Vista_Detalle_Pedidos</strong></small>
+    </div>
 
-    <div class="card">
-        <?php if (isset($error)): ?>
-            <div class="empty"><?= htmlspecialchars($error) ?></div>
+    <?php if (isset($error)): ?>
+        <div class="alert alert-warning text-center"><?= htmlspecialchars($error) ?></div>
+    <?php else: ?>
+
+        <?php if (empty($detalles)): ?>
+            <div class="alert alert-info text-center">No hay registros en la vista.</div>
         <?php else: ?>
 
-            <?php if (empty($detalles)): ?>
-                <div class="empty">No hay registros en la vista.</div>
-            <?php else: ?>
+            <?php
+           
+               //AGRUPAMOS EL RESULTADO POR ID_PEDIDO
+              
+            $agrupado = [];
 
-                <table aria-label="Detalle de pedidos">
-                    <thead>
+            foreach ($detalles as $row) {
+                $id = $row['Id_pedido'];
+
+                // si no existe, inicializamos
+                if (!isset($agrupado[$id])) {
+                    $agrupado[$id] = [
+                        'Id_pedido'     => $id,
+                        'Fecha_pedido'  => $row['Fecha_pedido'],
+                        'Estado'        => $row['Estado'],
+                        'Cliente'       => $row['Cliente'],
+                        'Empleado'      => $row['Empleado'],
+                        'Total_Pedido'  => $row['Total_Pedido'] ?? 0,
+                        'Productos'     => []
+                    ];
+                }
+
+                // Agregamos producto al array
+                $agrupado[$id]['Productos'][] = [
+                    'Producto'        => $row['Producto'],
+                    'Cantidad'        => $row['Cantidad'],
+                    'PrecioUnitario'  => $row['PrecioUnitario'],
+                    'Subtotal'        => $row['Subtotal']
+                ];
+            }
+            ?>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle">
+                    <thead class="table-dark">
                         <tr>
                             <th>ID Pedido</th>
                             <th>Fecha</th>
                             <th>Estado</th>
                             <th>Cliente</th>
                             <th>Empleado</th>
-                            <th>Producto</th>
-                            <th class="right">Precio Unitario</th>
-                            <th class="right">Cantidad</th>
-                            <th class="right">Subtotal</th>
-                            <th class="right">Total Pedido</th>
+                            <th>Detalle de Productos</th>
+                            <th class="text-end">Total Pedido</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($detalles as $row): ?>
-                            <tr>
-                                <td><?= htmlspecialchars($row['Id_pedido']) ?></td>
-                                <td class="small"><?= htmlspecialchars($row['Fecha_pedido']) ?></td>
-                                <td><?= htmlspecialchars($row['Estado']) ?></td>
-                                <td><?= htmlspecialchars($row['Cliente']) ?></td>
-                                <td><?= htmlspecialchars($row['Empleado']) ?></td>
-                                <td><?= htmlspecialchars($row['Producto']) ?></td>
 
-                                <td class="right">
-                                    <?= isset($row['PrecioUnitario']) ? number_format((float)$row['PrecioUnitario'],2) : '-' ?>
-                                </td>
-                                <td class="right">
-                                    <?= isset($row['Cantidad']) ? (int)$row['Cantidad'] : '-' ?>
-                                </td>
-                                <td class="right">
-                                    <?= isset($row['Subtotal']) ? number_format((float)$row['Subtotal'],2) : '-' ?>
-                                </td>
-                                <td class="right">
-                                    <?= isset($row['Total_Pedido']) ? number_format((float)$row['Total_Pedido'],2) : '-' ?>
-                                </td>
-                            </tr>
+                        <?php foreach ($agrupado as $pedido): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($pedido['Id_pedido']) ?></td>
+                            <td><?= htmlspecialchars($pedido['Fecha_pedido']) ?></td>
+                            <td><?= htmlspecialchars($pedido['Estado']) ?></td>
+                            <td><?= htmlspecialchars($pedido['Cliente']) ?></td>
+                            <td><?= htmlspecialchars($pedido['Empleado']) ?></td>
+
+                            <td>
+                                <ul class="mb-0">
+                                <?php foreach ($pedido['Productos'] as $prod): ?>
+                                    <li>
+                                        <strong><?= htmlspecialchars($prod['Producto']) ?></strong>
+                                        — Cant: <?= (int)$prod['Cantidad'] ?>
+                                        — PU: <?= number_format((float)$prod['PrecioUnitario'], 2) ?>
+                                        — Sub: <?= number_format((float)$prod['Subtotal'], 2) ?>
+                                    </li>
+                                <?php endforeach; ?>
+                                </ul>
+                            </td>
+
+                            <td class="text-end">
+                                <?= number_format((float)$pedido['Total_Pedido'], 2) ?>
+                            </td>
+                        </tr>
                         <?php endforeach; ?>
+
                     </tbody>
                 </table>
+            </div>
 
-            <?php endif; ?>
         <?php endif; ?>
-    </div>
+    <?php endif; ?>
 </div>
-</body>
-</html>

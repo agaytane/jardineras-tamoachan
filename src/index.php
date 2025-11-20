@@ -28,6 +28,34 @@ switch ($accion) {
         $controller->index();
         break;
 
+    case 'VISTAS':
+        require_once __DIR__ . '/controllers/Ctrl_Vistas.php';
+        $controller = new VistasController($conn);
+        $accionVista = strtoupper($partes[1] ?? '');
+
+        switch ($accionVista) {
+            case 'PEDIDO_CLIENTE_EMPLEADO':
+                $controller->pedidoClienteEmpleado();
+                break;
+            case 'PRODUCTO_GAMA_DETALLE':
+                $controller->productoGamaDetalle();
+                break;
+            case 'DETALLE_PEDIDO_INFO':
+                $controller->detallePedidoInfo();
+                break;
+            case 'EMPLEADO_OFICINA_PEDIDOS':
+                $controller->empleadoOficinaPedidos();
+                break;
+            case 'CLIENTE_PEDIDO_PRODUCTOS':
+                $controller->clientePedidoProductos();
+                break;
+            default:
+                echo "<h2>404 - Vista no encontrada</h2>";
+       }
+        break;
+
+
+
     case 'PRODUCTOS':
         require_once __DIR__ . '/controllers/Ctrl_Producto.php';
         $controller = new ProductoController($conn);

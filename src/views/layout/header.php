@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>Sistema Jardinería</title>
+    <link href ="/assets/css/estilos_jardineria.css" rel="stylesheet" >
+    <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
 
-    <!-- Cargar CSS global -->
-    <link rel="stylesheet" href="/src/assets/css/estilos_jardineria.css">
 </head>
-
 <body>
 <header class="header-jardin">
-    <h1>🌿 Sistema de Gestión Jardines Tamoanchan</h1>
+    <h1>Sistema de Gestión Jardines Tamoanchan</h1>
+    <div class="header-subtitle">Cultivando excelencia en cada detalle</div>
 </header>
 
-<main class="contenido-principal">
+

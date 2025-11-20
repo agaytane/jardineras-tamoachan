@@ -14,9 +14,7 @@ class Empleado {
 /* ==========================================================
    PRODUCTOS CRUD
    ========================================================== */
-
 class ProductModel {
-
     private $conn;
 
     public function __construct($conn) {
@@ -43,7 +41,6 @@ class ProductModel {
                 :id, :nom, :des, :precio, :stock, :gama";
 
         $stmt = $this->conn->prepare($sql);
-
         $stmt->bindParam(":id", $data['Id_producto']);
         $stmt->bindParam(":nom", $data['Nombre']);
         $stmt->bindParam(":des", $data['Descripcion']);
@@ -59,7 +56,6 @@ class ProductModel {
                 :id, :nom, :des, :precio, :stock, :gama";
 
         $stmt = $this->conn->prepare($sql);
-
         $stmt->bindParam(":id", $data['Id_producto']);
         $stmt->bindParam(":nom", $data['Nombre']);
         $stmt->bindParam(":des", $data['Descripcion']);
@@ -70,7 +66,6 @@ class ProductModel {
         return $stmt->execute();
     }
 
-    /* ELIMINAR */
     public function eliminar($id) {
         $sql = "EXEC SP_ELIMINAR_PRODUCTO :id";
         $stmt = $this->conn->prepare($sql);
@@ -79,6 +74,9 @@ class ProductModel {
     }
 }
 
+/* ==========================================================
+   DETALLES DE PEDIDOS
+   ========================================================== */
 class VistaPedidos {
     private $conn;
 
@@ -88,6 +86,43 @@ class VistaPedidos {
 
     public function obtenerDetalles() {
         $sql = "SELECT * FROM Vista_Detalle_Pedidos;";
+        $stmt = $this->conn->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+}
+
+class VistasModel {
+    private $conn;
+    public function __construct($conn) {
+        $this->conn = $conn;
+    }
+
+    public function pedidoClienteEmpleado() {
+        $sql = "SELECT * FROM AGE_V_PEDIDO_CLIENTE_EMPLEADO;";
+        $stmt = $this->conn->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function productoGamaDetalle() {
+        $sql = "SELECT * FROM AGE_V_PRODUCTO_GAMA_DETALLE;";
+        $stmt = $this->conn->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function detallePedidoInfo() {
+        $sql = "SELECT * FROM AGE_V_DETALLE_PEDIDO_INFO;";
+        $stmt = $this->conn->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function empleadoOficinaPedidos() {
+        $sql = "SELECT * FROM AGE_V_EMPLEADO_OFICINA_PEDIDOS;";
+        $stmt = $this->conn->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function clientePedidoProductos() {
+        $sql = "SELECT * FROM AGE_V_CLIENTE_PEDIDO_PRODUCTOS;";
         $stmt = $this->conn->query($sql);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
