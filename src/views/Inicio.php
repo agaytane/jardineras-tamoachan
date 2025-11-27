@@ -9,7 +9,7 @@
             </div>
 
             <div class="botones">
-                <!-- CRUD básico -->
+                <!-- CRUD básico el pepe -->
                 <a href="/PRODUCTOS" class="btn-jardin">🌱 Productos</a>
                 <a href="/EMPLEADOS" class="btn-jardin">👨‍🌾 Empleados</a>
                 <a href="/DETALLES_PEDIDO" class="btn-jardin">📦 Detalles de Pedido</a>
