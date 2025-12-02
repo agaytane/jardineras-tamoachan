@@ -261,3 +261,31 @@ body {
         font-size: 13px;
     }
 }
+
+        .header-jardin {
+            background: linear-gradient(135deg, #143414, #0d260f);
+            color: white;
+            text-align: center;
+            padding: 35px 20px;
+        }
+
+        /* Logo centrado y más pequeño */
+        .header-jardin img.logo-jardin {
+            width: 65px;              /* tamaño reducido */
+            margin-bottom: 10px;      /* separación */
+            display: block;
+            margin-left: auto;
+            margin-right: auto;       /* centra la imagen */
+            filter: drop-shadow(0px 0px 5px rgba(0,0,0,0.4));
+        }
+
+        .header-jardin h1 {
+            margin: 0;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .header-subtitle {
+            font-size: 1.1rem;
+            opacity: .9;
+        }
