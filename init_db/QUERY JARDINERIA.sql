@@ -86,6 +86,10 @@ EXEC sp_MSforeachtable 'ALTER TABLE ? CHECK CONSTRAINT ALL'
 
 USE JARDINES_TAMOANCHAN;
 
+
+ALTER TABLE PRODUCTO ALTER COLUMN Nombre VARCHAR(40);
+ALTER TABLE PRODUCTO ALTER COLUMN Descripcion VARCHAR(40);
+
 -- 1. GAMA_PRODUCTO (Categorías de productos de jardinería)
 INSERT INTO GAMA_PRODUCTO (Id_gama, Nombre_gama, Descripcion_gama) VALUES
 (1, 'Plantas', 'Plantas ornamentales y de ornato'),
