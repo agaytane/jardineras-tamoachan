@@ -48,8 +48,8 @@ CREATE TABLE GAMA_PRODUCTO(
     Nombre_gama VARCHAR(20),
     Descripcion_gama VARCHAR(40)
 )
-GO
 
+GO
 CREATE TABLE PRODUCTO (
     Id_producto INT PRIMARY KEY,
     Nombre VARCHAR(20),
@@ -436,4 +436,35 @@ WHERE Existencia = (SELECT MAX(Existencia) FROM PRODUCTO);
 -- complemetar politicas de la empresa sanciones  
 -- cuadro de roles completo
 -- correccion de diseño modular login 
+
+CREATE TABLE ROLES (
+ Id_rol INT PRIMARY KEY IDENTITY(1,1),
+ Nombre_rol VARCHAR(20) NOT NULL,
+ Descripcion VARCHAR(50)
+ );
+ 
+ CREATE TABLE USUARIOS (
+ Id_usuario INT PRIMARY KEY IDENTITY(1,1),
+ Usuario VARCHAR(20) NOT NULL UNIQUE,
+ Password VARCHAR(255) NOT NULL,
+ Fk_id_empleado INT,
+ Fk_id_rol INT,
+ Activo BIT DEFAULT 1,
+ FOREIGN KEY (Fk_id_empleado) REFERENCES EMPLEADO(Id_empleado),
+ FOREIGN KEY (Fk_id_rol) REFERENCES ROLES(Id_rol)
+ );
+ 
+ INSERT INTO ROLES (Nombre_rol, Descripcion) VALUES
+ ('ADMIN', 'Acceso completo al sistema'),
+ ('GERENTE', 'Acceso a reportes y gestión'),
+ ('EMPLEADO', 'Acceso a ventas y productos'),
+ ('INVENTARIO', 'Solo acceso a inventario');
+ 
+ INSERT INTO USUARIOS (Usuario, Password, Fk_id_rol, Activo)
+ VALUES ('admin', '$2y$10$7zLcmtGvE8oEH2E/pYjY3uW82vXfBobyi9aHpZRExJZt1lPhkvOqW', 1, 1);
+ -- Password hashed for 'admin123'
+
+UPDATE dbo.USUARIOS
+SET Password = '$2y$10$uU9Wm0CYH6rCs7o7uky.ZuvOjd/l252LHVpNYnXm9uyHeupemVXh'
+WHERE Usuario = 'admin';
 
