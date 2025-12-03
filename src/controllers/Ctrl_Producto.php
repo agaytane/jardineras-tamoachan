@@ -4,29 +4,24 @@ require_once __DIR__ . '/../model/modelo.php';
 class ProductoController {
 
     private $model;
-
     public function __construct($conn) {
         $this->model = new ProductModel($conn);
     }
+       //LISTAR PRODUCTOS
 
-    /* ==========================================================
-       LISTAR PRODUCTOS
-       ========================================================== */
     public function index() {
         $productos = $this->model->listar();
         require __DIR__ . '/../views/Productos/listar.php';
     }
 
-    /* ==========================================================
-       FORMULARIO CREAR
-       ========================================================== */
+
+       //FORMULARIO CREAR
     public function crear() {
         require __DIR__ . '/../views/Productos/crear.php';
     }
 
-    /* ==========================================================
-       GUARDAR NUEVO PRODUCTO
-       ========================================================== */
+    // GUARDAR NUEVO PRODUCTO
+ 
     public function guardar() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
@@ -45,9 +40,7 @@ class ProductoController {
         }
     }
 
-    /* ==========================================================
-       FORMULARIO EDITAR
-       ========================================================== */
+    // FORMULARIO EDITAR
     public function editar($id) {
         $producto = $this->model->obtener($id);
 
@@ -59,9 +52,7 @@ class ProductoController {
         require __DIR__ . '/../views/Productos/editar.php';
     }
 
-    /* ==========================================================
-       ACTUALIZAR PRODUCTO
-       ========================================================== */
+    // ACTUALIZAR PRODUCTO
     public function actualizar() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
@@ -80,9 +71,7 @@ class ProductoController {
         }
     }
 
-    /* ==========================================================
-       ELIMINAR PRODUCTO
-       ========================================================== */
+    // ELIMINAR PRODUCTO
     public function eliminar($id) {
         $this->model->eliminar($id);
         header("Location: /PRODUCTOS");

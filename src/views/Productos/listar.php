@@ -7,7 +7,7 @@
         <table class="table table-bordered table-hover">
             <thead class="table-success">
                 <tr>
-                    <th>ID</th>
+                   
                     <th>Nombre</th>
                     <th>Descripción</th>
                     <th>Precio</th>
@@ -19,7 +19,7 @@
             <tbody>
                 <?php foreach($productos as $p): ?>
                 <tr>
-                    <td><?= $p["Id_producto"] ?></td>
+                   
                     <td><?= $p["Nombre"] ?></td>
                     <td><?= $p["Descripcion"] ?></td>
                     <td>$<?= number_format($p["Precio_venta"], 2) ?></td>

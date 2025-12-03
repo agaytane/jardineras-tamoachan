@@ -5,7 +5,7 @@
         <table class="table table-bordered table-hover">
             <thead class="table-dark">
                 <tr>
-                    <th>ID</th>
+               
                     <th>Nombre</th>
                     <th>Apellidos</th>
                     <th>Email</th>
@@ -17,7 +17,7 @@
             <tbody>
                 <?php foreach ($empleados as $row): ?>
                 <tr>
-                    <td><?= $row['Id_empleado'] ?></td>
+                    
                     <td><?= $row['Nombre_emp'] ?></td>
                     <td><?= $row['Apellido_emp'] ?></td>
                     <td><?= $row['Email_emp'] ?></td>
