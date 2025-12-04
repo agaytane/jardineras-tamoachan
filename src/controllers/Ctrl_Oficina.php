@@ -26,10 +26,28 @@ class OficinaController {
         }
     }
 
-    public function editar($id) {
-        $oficina = $this->modelo->obtener($id);
-        require '../views/oficina/editar.php';
+public function editar($id = null) {
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $id = $_POST['id'] ?? null;
     }
+
+    if (!$id) {
+        require __DIR__ . '/../views/oficina/seleccionar_editar.php';
+        return;
+    }
+
+    $oficina = $this->modelo->obtener($id);
+
+    if (!$oficina) {
+        echo "<div class='alert alert-danger'>Oficina no encontrada</div>";
+        echo "<a href='/OFICINA/EDITAR' class='btn btn-secondary'>Intentar otro</a>";
+        return;
+    }
+
+    require __DIR__ . '/../views/oficina/editar.php';
+}
+
 
     public function actualizar() {
         $this->modelo->actualizar($_POST);

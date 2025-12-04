@@ -7,7 +7,7 @@ class EmpleadoModel {
     }
 
     // ✅ LISTAR
-    public function obtenerTodos() {
+    public function listar() {
         try {
             $sql = "SELECT * FROM EMPLEADO";
             $stmt = $this->conn->prepare($sql);

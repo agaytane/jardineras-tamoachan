@@ -30,8 +30,40 @@ switch ($accion) {
     case 'EMPLEADOS':
         require_once __DIR__ . '/controllers/Ctrl_Empl.php';
         $controller = new EmpleadoController($conn);
-        $controller->index();
-        break;
+
+    if (!$param1) {
+           $controller->index(); // SOLO MENÚ
+    } else {
+        switch (strtoupper($param1)) {
+
+            case 'CREAR':
+                $controller->crear();
+                break;
+
+            case 'GUARDAR':
+                $controller->guardar();
+                break;
+
+            case 'VER':
+                $controller->listar(); // AQUÍ ya se listan
+                break;
+
+            case 'EDITAR':
+                $id = $partes[2] ?? null;
+                $controller->editar($id);
+                break;
+
+            case 'ACTUALIZAR':
+                $controller->actualizar();
+                break;
+
+            case 'ELIMINAR':
+                $id = $partes[2] ?? null;
+                $controller->eliminar($id);
+                break;
+        }
+    }
+    break;
 
     /* ===========================
        DETALLE PEDIDO

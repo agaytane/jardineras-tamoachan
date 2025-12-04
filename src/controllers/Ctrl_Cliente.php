@@ -1,5 +1,5 @@
 <?php
-require_once '../models/ClienteModel.php';
+require_once __DIR__ . '/../models/ClienteModel.php';
 
 class ClienteController {
     private $modelo;
@@ -9,12 +9,17 @@ class ClienteController {
     }
 
     public function index() {
-        $clientes = $this->modelo->listar();
-        require '../views/cliente/index.php';
+        $ruta = "CLIENTE";
+        $titulo = "Clientes";
+        require __DIR__ . '/../views/cliente/index.php';
+    }
+    public function listar() {
+        $datos = $this->modelo->listar();
+        require __DIR__ . '/../views/cliente/listar.php';
     }
 
     public function crear() {
-        require '../views/cliente/crear.php';
+        require __DIR__ . '/../views/cliente/crear.php';
     }
 
     public function guardar() {
@@ -24,10 +29,28 @@ class ClienteController {
         }
     }
 
-    public function editar($id) {
-        $cliente = $this->modelo->obtener($id);
-        require '../views/cliente/editar.php';
+    public function editar($id = null) {
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $id = $_POST['id'] ?? null;
     }
+
+    if (!$id) {
+        require __DIR__ . '/../views/cliente/seleccionar_editar.php';
+        return;
+    }
+
+    $cliente = $this->modelo->obtener($id);
+
+    if (!$cliente) {
+        echo "<div class='alert alert-danger'>Cliente no encontrado</div>";
+        echo "<a href='/CLIENTE/EDITAR' class='btn btn-secondary'>Intentar otro</a>";
+        return;
+    }
+
+    require __DIR__ . '/../views/cliente/editar.php';
+    }
+
 
     public function actualizar() {
         $this->modelo->actualizar($_POST);

@@ -24,10 +24,28 @@ class PedidoController {
         }
     }
 
-    public function editar($id) {
-        $pedido = $this->modelo->obtener($id);
-        require '../views/pedido/editar.php';
+    public function editar($id = null) {
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $id = $_POST['id'] ?? null;
     }
+
+    if (!$id) {
+        require __DIR__ . '/../views/pedido/seleccionar_editar.php';
+        return;
+    }
+
+    $pedido = $this->modelo->obtener($id);
+
+    if (!$pedido) {
+        echo "<div class='alert alert-danger'>Pedido no encontrado</div>";
+        echo "<a href='/PEDIDO/EDITAR' class='btn btn-secondary'>Intentar otro</a>";
+        return;
+    }
+
+    require __DIR__ . '/../views/pedido/editar.php';
+    }
+
 
     public function actualizar() {
         $this->modelo->actualizar($_POST);

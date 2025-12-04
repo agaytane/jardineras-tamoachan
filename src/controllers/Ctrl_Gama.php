@@ -24,10 +24,28 @@ class GamaController {
         }
     }
 
-    public function editar($id) {
-        $gama = $this->modelo->obtener($id);
-        require '../views/gama/editar.php';
+    public function editar($id = null) {
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $id = $_POST['id'] ?? null;
     }
+
+    if (!$id) {
+        require __DIR__ . '/../views/gama/seleccionar_editar.php';
+        return;
+    }
+
+    $gama = $this->modelo->obtener($id);
+
+    if (!$gama) {
+        echo "<div class='alert alert-danger'>Gama no encontrada</div>";
+        echo "<a href='/GAMA/EDITAR' class='btn btn-secondary'>Intentar otro</a>";
+        return;
+    }
+
+    require __DIR__ . '/../views/gama/editar.php';
+}
+
 
     public function actualizar() {
         $this->modelo->actualizar($_POST);
