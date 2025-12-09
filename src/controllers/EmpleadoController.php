@@ -1,6 +1,7 @@
 <?php
+namespace App\Controllers;
 
-require_once __DIR__ . '/../models/EmpleadoModel.php';
+use App\Models\EmpleadoModel;
 
 class EmpleadoController {
     private $modelo;

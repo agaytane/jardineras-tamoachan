@@ -1,5 +1,9 @@
 <?php
-require_once __DIR__ . '/../models/ClienteModel.php';
+namespace App\Controllers;
+
+use App\Models\ClienteModel;
+use App\Helpers\Auth;
+
 class ClienteController {
     private $modelo;
     public function __construct($conn) {
@@ -11,17 +15,7 @@ class ClienteController {
     // ================================
     // VALIDAR PERMISOS
     // ================================
-    private function requireRole($rolesPermitidos = []) {
-        $rol = $_SESSION['rol'] ?? null;
 
-        if (!$rol || !in_array($rol, $rolesPermitidos)) {
-            echo "<div class='alert alert-danger'>
-                    ❌ No tienes permisos para acceder a esta sección.
-                  </div>";
-            echo "<a href='/' class='btn btn-secondary mt-3'>Volver al inicio</a>";
-            exit;
-        }
-    }
     // ========================
     // PANTALLA PRINCIPAL CLIENTE
     // ========================
@@ -41,11 +35,11 @@ class ClienteController {
     // CREAR — ADMIN, GERENTE
     // ========================
     public function crear() {
-        $this->requireRole(['ADMIN', 'GERENTE']);
+        Auth::requireRole(['ADMIN', 'GERENTE']);
         require __DIR__ . '/../views/cliente/crear.php';
     }
     public function guardar() {
-        $this->requireRole(['ADMIN', 'GERENTE']);
+        Auth::requireRole(['ADMIN', 'GERENTE']);
 
         if ($_POST) {
             $this->modelo->insertar($_POST);
@@ -56,7 +50,7 @@ class ClienteController {
     // EDITAR — ADMIN, GERENTE
     // ========================
     public function editar($id = null) {
-        $this->requireRole(['ADMIN', 'GERENTE']);
+        Auth::requireRole(['ADMIN', 'GERENTE']);
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = $_POST['id'] ?? null;
@@ -81,7 +75,7 @@ class ClienteController {
     // ACTUALIZAR — ADMIN, GERENTE
     // ========================
     public function actualizar() {
-        $this->requireRole(['ADMIN', 'GERENTE']);
+        Auth::requireRole(['ADMIN', 'GERENTE']);
 
         if ($_POST) {
             $this->modelo->actualizar($_POST);
@@ -92,7 +86,7 @@ class ClienteController {
     // ELIMINAR — SOLO ADMIN
     // ========================
     public function eliminar($id = null) {
-        $this->requireRole(['ADMIN']);
+        Auth::requireRole(['ADMIN']);
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = $_POST['id'] ?? null;

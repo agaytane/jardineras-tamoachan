@@ -1,5 +1,7 @@
 <?php
-require_once __DIR__ . '/../models/UsuarioModel.php';
+namespace App\Controllers;
+
+use App\Models\UsuarioModel;
 
 class LoginController {
 

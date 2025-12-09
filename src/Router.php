@@ -1,5 +1,12 @@
 <?php
-require_once __DIR__ . '/helpers/Auth.php';
+namespace App;
+
+use App\Helpers\Auth;
+use App\Controllers\LoginController;
+use App\Controllers\InicioController;
+use App\Controllers\EmpleadoController;
+use App\Controllers\ClienteController;
+use App\Controllers\ProductoController;
 
 class Router {
     
@@ -37,7 +44,6 @@ class Router {
             // LOGIN
             // ---------------------
             case 'LOGIN':
-                require_once __DIR__ . '/controllers/LoginController.php';
                 $controller = new LoginController($this->conn);
 
                 if (!$param1) {
@@ -58,7 +64,6 @@ class Router {
             // INICIO
             // ---------------------
             case 'INICIO':
-                require_once __DIR__ . '/controllers/InicioController.php';
                 $controller = new InicioController();
                 $controller->index();
                 break;
@@ -67,7 +72,6 @@ class Router {
             // EMPLEADOS
             // ---------------------
             case 'EMPLEADOS':
-                require_once __DIR__ . '/controllers/EmpleadoController.php';
                 $controller = new EmpleadoController($this->conn);
 
                 if (!$param1) {
@@ -112,7 +116,6 @@ class Router {
             // CLIENTES
             // ---------------------
             case 'CLIENTES':
-                require_once __DIR__ . '/controllers/ClienteController.php';
                 $controller = new ClienteController($this->conn);
 
                 if (!$param1) {
@@ -156,7 +159,6 @@ class Router {
             // PRODUCTOS
             // ---------------------
             case 'PRODUCTOS':
-                require_once __DIR__ . '/controllers/ProductoController.php';
                 $controller = new ProductoController($this->conn);
 
                 if (!$param1) {

@@ -1,0 +1,10 @@
+{
+    "name": "jardineras/tamoachan",
+    "description": "Sistema de gestión de Jardines Tamoanchan",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "require": {}
+}

@@ -11,6 +11,9 @@ RUN apt-get update && apt-get install -y \
     libgssapi-krb5-2 \
     && rm -rf /var/lib/apt/lists/*
 
+# Instalar Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
 # ===== Registrar clave de Microsoft en formato compatible =====
 RUN mkdir -p /usr/share/keyrings && \
     curl -fsSL https://packages.microsoft.com/keys/microsoft.asc \

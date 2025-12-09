@@ -1,5 +1,8 @@
 <?php
-require_once __DIR__ . '/../models/ProductoModel.php';
+namespace App\Controllers;
+
+use App\Models\ProductoModel;
+use App\Helpers\Auth;
 
 class ProductoController {
 
