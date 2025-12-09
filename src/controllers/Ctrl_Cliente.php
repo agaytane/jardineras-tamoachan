@@ -11,7 +11,6 @@ class ClienteController {
         }
         $this->modelo = new ClienteModel($conn);
     }
-
     // ================================
     // PANTALLA PRINCIPAL CLIENTES
     // ================================
@@ -20,7 +19,6 @@ class ClienteController {
         $titulo = "Clientes";
         require __DIR__ . '/../views/cliente/index.php';
     }
-
     // ================================
     // LISTAR — SIN RESTRICCIONES
     // ================================
@@ -28,17 +26,16 @@ class ClienteController {
         $clientes = $this->modelo->listar();
         require __DIR__ . '/../views/cliente/listar.php';
     }
-
     // ================================
     // CREAR — ADMIN, GERENTE
     // ================================
     public function crear() {
-        $this->requireRole(['ADMIN', 'GERENTE']);
+        requireRole(['ADMIN', 'GERENTE']);
         require __DIR__ . '/../views/cliente/crear.php';
     }
 
     public function guardar() {
-        $this->requireRole(['ADMIN', 'GERENTE']);
+        requireRole(['ADMIN', 'GERENTE']);
 
         if ($_POST) {
             $this->modelo->insertar($_POST);
@@ -50,7 +47,7 @@ class ClienteController {
     // EDITAR — ADMIN, GERENTE
     // ================================
     public function editar($id = null) {
-        $this->requireRole(['ADMIN', 'GERENTE']);
+        requireRole(['ADMIN', 'GERENTE']);
 
         // Si viene vía formulario
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -74,12 +71,11 @@ class ClienteController {
 
         require __DIR__ . '/../views/cliente/editar.php';
     }
-
     // ================================
     // ACTUALIZAR — ADMIN, GERENTE
     // ================================
     public function actualizar() {
-        $this->requireRole(['ADMIN', 'GERENTE']);
+        requireRole(['ADMIN', 'GERENTE']);
 
         if ($_POST) {
             $this->modelo->actualizar($_POST);
@@ -87,12 +83,11 @@ class ClienteController {
 
         header("Location: /CLIENTES");
     }
-
     // ================================
     // ELIMINAR — SOLO ADMIN
     // ================================
     public function eliminar($id = null) {
-        $this->requireRole(['ADMIN']);
+        requireRole(['ADMIN']);
 
         // Si viene desde formulario
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {

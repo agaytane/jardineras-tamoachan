@@ -3,7 +3,6 @@ require_once __DIR__ . '/../models/ProductoModel.php';
 require_once __DIR__ . '/../helpers/auth.php';
 
 class ProductoController {
-
     private $modelo;
 
     public function __construct($conn) {
