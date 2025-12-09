@@ -17,29 +17,20 @@ $partes = explode('/', $url);
 $accion = empty($url) ? 'LOGIN' : strtoupper($partes[0]);
 $param1 = $partes[1] ?? null;
 
+require_once __DIR__ . '/helpers/Auth.php';
+
 // =======================================================
 // 🔐 PROTEGER RUTAS (solo deja pasar LOGIN)
 // =======================================================
 $noProtegidas = ['LOGIN'];
 
-if (!isset($_SESSION['usuario']) && !in_array($accion, $noProtegidas)) {
-    header("Location: /LOGIN");
-    exit;
+if (!in_array($accion, $noProtegidas)) {
+    Auth::check();
 }
 
 // =======================================================
-// FUNCIÓN PARA VALIDAR ROL DESDE EL ROUTER (GLOBAL)
+// ROUTER PRINCIPAL
 // =======================================================
-function requireRole($rolesPermitidos = []) {
-    $rol = isset($_SESSION['rol']) ? strtoupper($_SESSION['rol']) : null; // <- CORREGIDO
-
-    if (!$rol || !in_array($rol, $rolesPermitidos)) {
-        $message = "❌ No tienes permisos para acceder a esta sección.";
-        $button = ['url' => '/INICIO', 'text' => 'Volver'];
-        require __DIR__ . '/views/errors/generic.php';
-        exit;
-    }
-}
 // =======================================================
 // ROUTER PRINCIPAL
 // =======================================================
@@ -87,32 +78,32 @@ switch ($accion) {
             switch (strtoupper($param1)) {
 
                 case 'CREAR':
-                    requireRole(['ADMIN', 'GERENTE']);
+                    Auth::requireRole(['ADMIN', 'GERENTE']);
                     $controller->crear();
                     break;
 
                 case 'GUARDAR':
-                    requireRole(['ADMIN', 'GERENTE']);
+                    Auth::requireRole(['ADMIN', 'GERENTE']);
                     $controller->guardar();
                     break;
 
                 case 'VER':
-                    requireRole(['ADMIN', 'GERENTE',]);
+                    Auth::requireRole(['ADMIN', 'GERENTE',]);
                     $controller->listar();
                     break;
 
                 case 'EDITAR':
-                    requireRole(['ADMIN', 'GERENTE']);
+                    Auth::requireRole(['ADMIN', 'GERENTE']);
                     $controller->editar($partes[2] ?? null);
                     break;
 
                 case 'ACTUALIZAR':
-                    requireRole(['ADMIN', 'GERENTE']);
+                    Auth::requireRole(['ADMIN', 'GERENTE']);
                     $controller->actualizar();
                     break;
 
                 case 'ELIMINAR':
-                    requireRole(['ADMIN']);
+                    Auth::requireRole(['ADMIN']);
                     $controller->eliminar($partes[2] ?? null);
                     break;
             }
@@ -132,12 +123,12 @@ switch ($accion) {
             switch (strtoupper($param1)) {
 
                 case 'CREAR':
-                    requireRole(['ADMIN', 'GERENTE']);
+                    Auth::requireRole(['ADMIN', 'GERENTE']);
                     $controller->crear();
                     break;
 
                 case 'GUARDAR':
-                    requireRole(['ADMIN', 'GERENTE']);
+                    Auth::requireRole(['ADMIN', 'GERENTE']);
                     $controller->guardar();
                     break;
 
@@ -146,17 +137,17 @@ switch ($accion) {
                     break;
 
                 case 'EDITAR':
-                    requireRole(['ADMIN', 'GERENTE']);
+                    Auth::requireRole(['ADMIN', 'GERENTE']);
                     $controller->editar($partes[2] ?? null);
                     break;
 
                 case 'ACTUALIZAR':
-                    requireRole(['ADMIN', 'GERENTE']);
+                    Auth::requireRole(['ADMIN', 'GERENTE']);
                     $controller->actualizar();
                     break;
 
                 case 'ELIMINAR':
-                    requireRole(['ADMIN']);
+                    Auth::requireRole(['ADMIN']);
                     $controller->eliminar($partes[2] ?? null);
                     break;
             }
@@ -176,12 +167,12 @@ switch ($accion) {
             switch (strtoupper($param1)) {
 
                 case 'CREAR':
-                    requireRole(['ADMIN', 'INVENTARIO']);
+                    Auth::requireRole(['ADMIN', 'INVENTARIO']);
                     $controller->crear();
                     break;
 
                 case 'GUARDAR':
-                    requireRole(['ADMIN', 'INVENTARIO']);
+                    Auth::requireRole(['ADMIN', 'INVENTARIO']);
                     $controller->guardar();
                     break;
 
@@ -190,17 +181,17 @@ switch ($accion) {
                     break;
 
                 case 'EDITAR':
-                    requireRole(['ADMIN', 'INVENTARIO']);
+                    Auth::requireRole(['ADMIN', 'INVENTARIO']);
                     $controller->editar($partes[2] ?? null);
                     break;
 
                 case 'ACTUALIZAR':
-                    requireRole(['ADMIN', 'INVENTARIO']);
+                    Auth::requireRole(['ADMIN', 'INVENTARIO']);
                     $controller->actualizar();
                     break;
 
                 case 'ELIMINAR':
-                    requireRole(['ADMIN']);
+                    Auth::requireRole(['ADMIN']);
                     $controller->eliminar($partes[2] ?? null);
                     break;
             }

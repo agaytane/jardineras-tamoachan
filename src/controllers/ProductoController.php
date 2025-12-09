@@ -12,19 +12,7 @@ class ProductoController {
         $this->modelo = new ProductoModel($conn);
     }
 
-    // ================================
-    // VALIDAR PERMISOS
-    // ================================
-    private function requireRole($rolesPermitidos = []) {
-        $rol = $_SESSION['rol'] ?? null;
 
-        if (!$rol || !in_array($rol, $rolesPermitidos)) {
-            $message = "❌ No tienes permisos para acceder a esta sección.";
-            $button = ['url' => '/', 'text' => 'Volver al inicio'];
-            require __DIR__ . '/../views/errors/generic.php';
-            exit;
-        }
-    }
 
     // ========================
     // PANTALLA PRINCIPAL
@@ -47,12 +35,12 @@ class ProductoController {
     // CREAR — ADMIN, GERENTE
     // ========================
     public function crear() {
-        $this->requireRole(['ADMIN', 'GERENTE']);
+        Auth::requireRole(['ADMIN', 'GERENTE']);
         require __DIR__ . '/../views/producto/crear.php';
     }
 
     public function guardar() {
-        $this->requireRole(['ADMIN', 'GERENTE']);
+        Auth::requireRole(['ADMIN', 'GERENTE']);
 
         if ($_POST) {
             $this->modelo->insertar($_POST);
@@ -65,7 +53,7 @@ class ProductoController {
     // ========================
     public function editar($id = null) {
 
-        $this->requireRole(['ADMIN', 'GERENTE']);
+        Auth::requireRole(['ADMIN', 'GERENTE']);
 
         // Si viene del formulario POST
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -95,7 +83,7 @@ class ProductoController {
     // ACTUALIZAR — ADMIN, GERENTE
     // ========================
     public function actualizar() {
-        $this->requireRole(['ADMIN', 'GERENTE']);
+        Auth::requireRole(['ADMIN', 'GERENTE']);
 
         if ($_POST) {
             $this->modelo->actualizar($_POST);
@@ -107,7 +95,7 @@ class ProductoController {
     // ELIMINAR — SOLO ADMIN
     // ========================
     public function eliminar($id = null) {
-        $this->requireRole(['ADMIN']);
+        Auth::requireRole(['ADMIN']);
 
         // Si viene por POST
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
