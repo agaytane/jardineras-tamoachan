@@ -4,7 +4,7 @@ class ProductoController {
     private $modelo;
 
     public function __construct($conn) {
-        $this->modelo = new ProductoModel($conn);
+    $this->modelo = new ProductoModel($conn);
     }
 
     public function index() {
