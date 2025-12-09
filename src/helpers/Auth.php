@@ -30,8 +30,10 @@ class Auth {
         $rol = $rol ? strtoupper($rol) : null;
 
         if (!$rol || !in_array($rol, $rolesPermitidos)) {
-            $message = "❌ No tienes permisos para acceder a esta sección.";
-            $button = ['url' => '/INICIO', 'text' => 'Volver'];
+            $title = "Acceso Denegado";
+            $icon = "⛔";
+            $message = "No tienes permisos para acceder a esta sección. Si crees que esto es un error, contacta al administrador.";
+            $button = ['url' => '/INICIO', 'text' => 'Volver al Inicio'];
             
             // Ajustamos la ruta relativa para que funcione desde cualquier punto
             // Asumimos que Auth.php está en src/helpers/
