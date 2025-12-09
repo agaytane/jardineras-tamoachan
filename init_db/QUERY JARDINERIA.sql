@@ -443,14 +443,12 @@ CREATE TABLE ROLES (
  Descripcion VARCHAR(50)
  );
  
- CREATE TABLE USUARIOS (
+CREATE TABLE USUARIOS (
  Id_usuario INT PRIMARY KEY IDENTITY(1,1),
  Usuario VARCHAR(20) NOT NULL UNIQUE,
  Password VARCHAR(255) NOT NULL,
- Fk_id_empleado INT,
  Fk_id_rol INT,
  Activo BIT DEFAULT 1,
- FOREIGN KEY (Fk_id_empleado) REFERENCES EMPLEADO(Id_empleado),
  FOREIGN KEY (Fk_id_rol) REFERENCES ROLES(Id_rol)
  );
  
@@ -459,12 +457,29 @@ CREATE TABLE ROLES (
  ('GERENTE', 'Acceso a reportes y gestión'),
  ('EMPLEADO', 'Acceso a ventas y productos'),
  ('INVENTARIO', 'Solo acceso a inventario');
- 
+
+ -- Usuario ADMIN
+INSERT INTO USUARIOS (Usuario, Password, Fk_id_rol, Activo)
+VALUES ('admin', 'admin123', 1, 1);
+-- Usuario GERENTE
+INSERT INTO USUARIOS (Usuario, Password, Fk_id_rol, Activo)
+VALUES ('gerente', 'gerente123', 2, 1);
+-- Usuario EMPLEADO
+INSERT INTO USUARIOS (Usuario, Password, Fk_id_rol, Activo)
+VALUES ('empleado', 'empleado123', 3, 1);
+-- Usuario INVENTARIO
+INSERT INTO USUARIOS (Usuario, Password, Fk_id_rol, Activo)
+VALUES ('inventario', 'inv123', 4, 1);
+
+SELECT Id_empleado, Nombre_emp, Apellido_emp
+FROM EMPLEADO;
+SELECT * FROM USUARIOS;
+
  INSERT INTO USUARIOS (Usuario, Password, Fk_id_rol, Activo)
- VALUES ('admin', '$2y$10$7zLcmtGvE8oEH2E/pYjY3uW82vXfBobyi9aHpZRExJZt1lPhkvOqW', 1, 1);
+ VALUES ('ADMIN', '$2y$10$7zLcmtGvE8oEH2E/pYjY3uW82vXfBobyi9aHpZRExJZt1lPhkvOqW', 1, 1);
  -- Password hashed for 'admin123'
 
 UPDATE dbo.USUARIOS
-SET Password = '$2y$10$uU9Wm0CYH6rCs7o7uky.ZuvOjd/l252LHVpNYnXm9uyHeupemVXh'
-WHERE Usuario = 'admin';
+SET Password = ''
+WHERE Usuario = 'ADMIN';
 

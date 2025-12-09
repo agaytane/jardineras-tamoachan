@@ -1,13 +1,12 @@
 <?php
+
 require_once __DIR__ . '/../models/EmpleadoModel.php';
 
 class EmpleadoController {
     private $modelo;
-
     public function __construct($conn) {
         $this->modelo = new EmpleadoModel($conn);
     }
-
     public function index() {
         $ruta = "EMPLEADOS";
         $titulo = "Empleados";

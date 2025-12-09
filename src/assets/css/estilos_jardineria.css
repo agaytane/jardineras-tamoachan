@@ -261,3 +261,98 @@ body {
         font-size: 13px;
     }
 }
+/* ================================
+   VISTA GLOBAL: ACCESO DENEGADO
+================================ */
+
+/* Contenedor centrado */
+.error-contenedor {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh;
+    padding: 20px;
+}
+
+/* Tarjeta principal */
+.error-card {
+    background: #ffffff;
+    padding: 40px 35px;
+    border-radius: 18px;
+    text-align: center;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.08);
+    border: 1px solid rgba(255, 80, 80, 0.15);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Línea superior estilo gradient */
+.error-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    background: linear-gradient(90deg, #ff3b30, #ff9500);
+}
+
+/* Ícono grande */
+.error-icono {
+    font-size: 50px;
+    margin-bottom: 10px;
+    color: #ff3b30;
+    filter: drop-shadow(0 2px 3px rgba(255, 59, 48, 0.3));
+}
+
+/* Título */
+.error-card h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #ff3b30;
+    margin-bottom: 15px;
+}
+
+/* Texto */
+.error-card p {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+/* Botón */
+.btn-volver {
+    display: inline-block;
+    padding: 12px 20px;
+    background: #2b7cff;
+    color: white !important;
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: 500;
+    box-shadow: 0 4px 6px rgba(43, 124, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.btn-volver:hover {
+    background: #1a5ecc;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(43, 124, 255, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .error-card {
+        padding: 30px;
+    }
+
+    .error-card h1 {
+        font-size: 24px;
+    }
+
+    .error-icono {
+        font-size: 40px;
+    }
+}
