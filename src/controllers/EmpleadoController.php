@@ -44,8 +44,9 @@ class EmpleadoController {
     $empleado = $this->modelo->obtener($id);
 
     if (!$empleado) {
-        echo "<div class='alert alert-danger'>Empleado no encontrado</div>";
-        echo "<a href='/EMPLEADOS/EDITAR' class='btn btn-secondary'>Intentar otro</a>";
+        $message = "Empleado no encontrado";
+        $button = ['url' => '/EMPLEADOS/EDITAR', 'text' => 'Intentar otro'];
+        require __DIR__ . '/../views/errors/generic.php';
         return;
     }
 

@@ -19,10 +19,9 @@ class ProductoController {
         $rol = $_SESSION['rol'] ?? null;
 
         if (!$rol || !in_array($rol, $rolesPermitidos)) {
-            echo "<div class='alert alert-danger'>
-                    ❌ No tienes permisos para acceder a esta sección.
-                  </div>";
-            echo "<a href='/' class='btn btn-secondary mt-3'>Volver al inicio</a>";
+            $message = "❌ No tienes permisos para acceder a esta sección.";
+            $button = ['url' => '/', 'text' => 'Volver al inicio'];
+            require __DIR__ . '/../views/errors/generic.php';
             exit;
         }
     }
@@ -83,8 +82,9 @@ class ProductoController {
         $producto = $this->modelo->obtener($id);
 
         if (!$producto) {
-            echo "<div class='alert alert-danger mt-4'>❌ Producto no encontrado</div>";
-            echo "<a href='/PRODUCTOS/EDITAR' class='btn btn-secondary mt-2'>Intentar otro ID</a>";
+            $message = "❌ Producto no encontrado";
+            $button = ['url' => '/PRODUCTOS/EDITAR', 'text' => 'Intentar otro ID'];
+            require __DIR__ . '/../views/errors/generic.php';
             return;
         }
 
@@ -122,8 +122,9 @@ class ProductoController {
         $producto = $this->modelo->obtener($id);
 
         if (!$producto) {
-            echo "<div class='alert alert-danger'>❌ Producto no encontrado</div>";
-            echo "<a href='/PRODUCTOS/ELIMINAR' class='btn btn-secondary'>Intentar otro</a>";
+            $message = "❌ Producto no encontrado";
+            $button = ['url' => '/PRODUCTOS/ELIMINAR', 'text' => 'Intentar otro'];
+            require __DIR__ . '/../views/errors/generic.php';
             return;
         }
 

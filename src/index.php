@@ -34,8 +34,9 @@ function requireRole($rolesPermitidos = []) {
     $rol = isset($_SESSION['rol']) ? strtoupper($_SESSION['rol']) : null; // <- CORREGIDO
 
     if (!$rol || !in_array($rol, $rolesPermitidos)) {
-        echo "<div class='alert alert-danger mt-3'>❌ No tienes permisos para acceder a esta sección.</div>";
-        echo "<a href='/INICIO' class='btn btn-secondary mt-3'>Volver</a>";
+        $message = "❌ No tienes permisos para acceder a esta sección.";
+        $button = ['url' => '/INICIO', 'text' => 'Volver'];
+        require __DIR__ . '/views/errors/generic.php';
         exit;
     }
 }
