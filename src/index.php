@@ -47,7 +47,7 @@ switch ($accion) {
     // LOGIN
     // ---------------------
     case 'LOGIN':
-        require_once __DIR__ . '/controllers/Ctrl_Login.php';
+        require_once __DIR__ . '/controllers/LoginController.php';
         $controller = new LoginController($conn);
 
         if (!$param1) {
@@ -68,7 +68,7 @@ switch ($accion) {
     // INICIO
     // ---------------------
     case 'INICIO':
-        require_once __DIR__ . '/controllers/Ctrl_Inicio.php';
+        require_once __DIR__ . '/controllers/InicioController.php';
         $controller = new InicioController();
         $controller->index();
         break;
@@ -77,7 +77,7 @@ switch ($accion) {
     // EMPLEADOS
     // ---------------------
     case 'EMPLEADOS':
-        require_once __DIR__ . '/controllers/Ctrl_Empl.php';
+        require_once __DIR__ . '/controllers/EmpleadoController.php';
         $controller = new EmpleadoController($conn);
 
         if (!$param1) {
@@ -122,7 +122,7 @@ switch ($accion) {
     // CLIENTES
     // ---------------------
     case 'CLIENTES':
-        require_once __DIR__ . '/controllers/Ctrl_Cliente.php';
+        require_once __DIR__ . '/controllers/ClienteController.php';
         $controller = new ClienteController($conn);
 
         if (!$param1) {
@@ -166,7 +166,7 @@ switch ($accion) {
     // PRODUCTOS
     // ---------------------
     case 'PRODUCTOS':
-        require_once __DIR__ . '/controllers/Ctrl_Producto.php';
+        require_once __DIR__ . '/controllers/ProductoController.php';
         $controller = new ProductoController($conn);
 
         if (!$param1) {
