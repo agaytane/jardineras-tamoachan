@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../models/ProductoModel.php';
+require_once __DIR__ . '/../helpers/auth.php';
 
 class ProductoController {
 
@@ -10,21 +11,6 @@ class ProductoController {
             session_start();
         }
         $this->modelo = new ProductoModel($conn);
-    }
-
-    // ================================
-    // VALIDAR PERMISOS
-    // ================================
-    private function requireRole($rolesPermitidos = []) {
-        $rol = $_SESSION['rol'] ?? null;
-
-        if (!$rol || !in_array($rol, $rolesPermitidos)) {
-            echo "<div class='alert alert-danger'>
-                    ❌ No tienes permisos para acceder a esta sección.
-                  </div>";
-            echo "<a href='/' class='btn btn-secondary mt-3'>Volver al inicio</a>";
-            exit;
-        }
     }
 
     // ========================
@@ -48,12 +34,12 @@ class ProductoController {
     // CREAR — ADMIN, GERENTE
     // ========================
     public function crear() {
-        $this->requireRole(['ADMIN', 'GERENTE']);
+        requireRole(['ADMIN', 'GERENTE']);
         require __DIR__ . '/../views/producto/crear.php';
     }
 
     public function guardar() {
-        $this->requireRole(['ADMIN', 'GERENTE']);
+        requireRole(['ADMIN', 'GERENTE']);
 
         if ($_POST) {
             $this->modelo->insertar($_POST);
@@ -66,7 +52,7 @@ class ProductoController {
     // ========================
     public function editar($id = null) {
 
-        $this->requireRole(['ADMIN', 'GERENTE']);
+        requireRole(['ADMIN', 'GERENTE']);
 
         // Si viene del formulario POST
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -95,7 +81,7 @@ class ProductoController {
     // ACTUALIZAR — ADMIN, GERENTE
     // ========================
     public function actualizar() {
-        $this->requireRole(['ADMIN', 'GERENTE']);
+        requireRole(['ADMIN', 'GERENTE']);
 
         if ($_POST) {
             $this->modelo->actualizar($_POST);
@@ -107,7 +93,7 @@ class ProductoController {
     // ELIMINAR — SOLO ADMIN
     // ========================
     public function eliminar($id = null) {
-        $this->requireRole(['ADMIN']);
+        requireRole(['ADMIN']);
 
         // Si viene por POST
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {

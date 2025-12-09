@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/helpers/auth.php';
 
 session_start();
 ob_start();
@@ -27,22 +28,12 @@ if (!isset($_SESSION['usuario']) && !in_array($accion, $noProtegidas)) {
     exit;
 }
 
-// =======================================================
-// FUNCIÓN PARA VALIDAR ROL DESDE EL ROUTER (GLOBAL)
-// =======================================================
-function requireRole($rolesPermitidos = []) {
-    $rol = isset($_SESSION['rol']) ? strtoupper($_SESSION['rol']) : null; // <- CORREGIDO
 
-    if (!$rol || !in_array($rol, $rolesPermitidos)) {
-        echo "<div class='alert alert-danger mt-3'>❌ No tienes permisos para acceder a esta sección.</div>";
-        echo "<a href='/INICIO' class='btn btn-secondary mt-3'>Volver</a>";
-        exit;
-    }
-}
 // =======================================================
 // ROUTER PRINCIPAL
 // =======================================================
 switch ($accion) {
+
     // ---------------------
     // LOGIN
     // ---------------------
@@ -57,6 +48,7 @@ switch ($accion) {
                 case 'AUTENTICAR':
                     $controller->autenticar();
                     break;
+
                 case 'LOGOUT':
                     $controller->logout();
                     break;
@@ -96,7 +88,7 @@ switch ($accion) {
                     break;
 
                 case 'VER':
-                    requireRole(['ADMIN', 'GERENTE',]);
+                    requireRole(['ADMIN', 'GERENTE']);
                     $controller->listar();
                     break;
 
