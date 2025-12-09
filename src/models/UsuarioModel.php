@@ -1,11 +1,9 @@
 <?php
 class UsuarioModel {
     private $conn;
-
     public function __construct($conn) {
         $this->conn = $conn;
     }
-
     public function login($usuario, $password) {
         try {
             $sql = "SELECT 
@@ -26,7 +24,6 @@ class UsuarioModel {
             if (!$user) {
                 return false;
             }
-
             // ⚠ VALIDACIÓN (tú usas contraseñas en texto plano)
             if ($password !== $user["Password"]) {
                 return false;

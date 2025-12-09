@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../models/ClienteModel.php';
-require_once __DIR__ . '/../helpers/auth.php';
+require_once __DIR__ . '/../helpers/auth.php';//mensajes de error y validaciones para required roles
 
 class ClienteController {
     private $modelo;
@@ -62,7 +62,7 @@ class ClienteController {
 
         // Cargar cliente
         $cliente = $this->modelo->obtener($id);
-
+        // Si no existe id de cliente
         if (!$cliente) {
             echo "<div class='alert alert-danger mt-3'>❌ Cliente no encontrado</div>";
             echo "<a href='/CLIENTES/EDITAR' class='btn btn-secondary mt-2'>Intentar otro</a>";
