@@ -2,7 +2,7 @@
 namespace App\Controllers;
 
 use App\Models\ClienteModel;
-use App\Helpers\Auth;
+
 
 class ClienteController {
     private $modelo;
@@ -35,11 +35,11 @@ class ClienteController {
     // CREAR — ADMIN, GERENTE
     // ========================
     public function crear() {
-        Auth::requireRole(['ADMIN', 'GERENTE']);
+
         require __DIR__ . '/../views/cliente/crear.php';
     }
     public function guardar() {
-        Auth::requireRole(['ADMIN', 'GERENTE']);
+
 
         if ($_POST) {
             $this->modelo->insertar($_POST);
@@ -50,7 +50,7 @@ class ClienteController {
     // EDITAR — ADMIN, GERENTE
     // ========================
     public function editar($id = null) {
-        Auth::requireRole(['ADMIN', 'GERENTE']);
+
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = $_POST['id'] ?? null;
@@ -75,7 +75,7 @@ class ClienteController {
     // ACTUALIZAR — ADMIN, GERENTE
     // ========================
     public function actualizar() {
-        Auth::requireRole(['ADMIN', 'GERENTE']);
+
 
         if ($_POST) {
             $this->modelo->actualizar($_POST);
@@ -86,7 +86,7 @@ class ClienteController {
     // ELIMINAR — SOLO ADMIN
     // ========================
     public function eliminar($id = null) {
-        Auth::requireRole(['ADMIN']);
+
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = $_POST['id'] ?? null;

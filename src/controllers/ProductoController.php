@@ -2,7 +2,7 @@
 namespace App\Controllers;
 
 use App\Models\ProductoModel;
-use App\Helpers\Auth;
+
 
 class ProductoController {
 
@@ -38,12 +38,12 @@ class ProductoController {
     // CREAR — ADMIN, GERENTE
     // ========================
     public function crear() {
-        Auth::requireRole(['ADMIN', 'GERENTE']);
+
         require __DIR__ . '/../views/producto/crear.php';
     }
 
     public function guardar() {
-        Auth::requireRole(['ADMIN', 'GERENTE']);
+
 
         if ($_POST) {
             $this->modelo->insertar($_POST);
@@ -56,7 +56,7 @@ class ProductoController {
     // ========================
     public function editar($id = null) {
 
-        Auth::requireRole(['ADMIN', 'GERENTE']);
+
 
         // Si viene del formulario POST
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -86,7 +86,7 @@ class ProductoController {
     // ACTUALIZAR — ADMIN, GERENTE
     // ========================
     public function actualizar() {
-        Auth::requireRole(['ADMIN', 'GERENTE']);
+
 
         if ($_POST) {
             $this->modelo->actualizar($_POST);
@@ -98,7 +98,7 @@ class ProductoController {
     // ELIMINAR — SOLO ADMIN
     // ========================
     public function eliminar($id = null) {
-        Auth::requireRole(['ADMIN']);
+
 
         // Si viene por POST
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
