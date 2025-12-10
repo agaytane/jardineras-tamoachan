@@ -17,193 +17,100 @@ class Router {
     }
 
     public function dispatch($url) {
-        // =======================================================
-        // LIMPIAR URL Y SEPARAR PARTES
-        // =======================================================
         $url = filter_var(trim($url, '/'), FILTER_SANITIZE_URL);
         $partes = explode('/', $url);
 
-        // Acción principal
-        $accion = empty($url) ? 'LOGIN' : strtoupper($partes[0]);
-        $param1 = $partes[1] ?? null;
+        // 1. Determinar Controlador Principal
+        $seccion = empty($url) ? 'LOGIN' : strtoupper($partes[0]);
+        $accion  = isset($partes[1]) ? strtoupper($partes[1]) : 'INDEX';
+        $id      = $partes[2] ?? null;
 
-        // =======================================================
-        // 🔐 PROTEGER RUTAS (solo deja pasar LOGIN)
-        // =======================================================
-        $noProtegidas = ['LOGIN'];
+        // 2. Cargar Configuración de Rutas
+        $routes = require __DIR__ . '/config/routes.php';
 
-        if (!in_array($accion, $noProtegidas)) {
-            Auth::check();
+        // 3. Validar si la sección existe
+        if (!array_key_exists($seccion, $routes)) {
+            $this->sendNotFound();
+            return;
         }
 
-        // =======================================================
-        // ROUTER PRINCIPAL
-        // =======================================================
-        switch ($accion) {
-            // ---------------------
-            // LOGIN
-            // ---------------------
-            case 'LOGIN':
-                $controller = new LoginController($this->conn);
+        $routeConfig = $routes[$seccion];
+        $actions = $routeConfig['actions'];
 
-                if (!$param1) {
-                    $controller->index();
-                } else {
-                    switch (strtoupper($param1)) {
-                        case 'AUTENTICAR':
-                            $controller->autenticar();
-                            break;
-                        case 'LOGOUT':
-                            $controller->logout();
-                            break;
-                    }
-                }
-                break;
-
-            // ---------------------
-            // INICIO
-            // ---------------------
-            case 'INICIO':
-                $controller = new InicioController();
-                $controller->index();
-                break;
-
-            // ---------------------
-            // EMPLEADOS
-            // ---------------------
-            case 'EMPLEADOS':
-                $controller = new EmpleadoController($this->conn);
-
-                if (!$param1) {
-                    $controller->index();
-                } else {
-                    switch (strtoupper($param1)) {
-
-                        case 'CREAR':
-                            Auth::requireRole(['ADMIN', 'GERENTE']);
-                            $controller->crear();
-                            break;
-
-                        case 'GUARDAR':
-                            Auth::requireRole(['ADMIN', 'GERENTE']);
-                            $controller->guardar();
-                            break;
-
-                        case 'VER':
-                            Auth::requireRole(['ADMIN', 'GERENTE']);
-                            $controller->listar();
-                            break;
-
-                        case 'EDITAR':
-                            Auth::requireRole(['ADMIN', 'GERENTE']);
-                            $controller->editar($partes[2] ?? null);
-                            break;
-
-                        case 'ACTUALIZAR':
-                            Auth::requireRole(['ADMIN', 'GERENTE']);
-                            $controller->actualizar();
-                            break;
-
-                        case 'ELIMINAR':
-                            Auth::requireRole(['ADMIN']);
-                            $controller->eliminar($partes[2] ?? null);
-                            break;
-                    }
-                }
-                break;
-
-            // ---------------------
-            // CLIENTES
-            // ---------------------
-            case 'CLIENTES':
-                $controller = new ClienteController($this->conn);
-
-                if (!$param1) {
-                    $controller->index();
-                } else {
-                    switch (strtoupper($param1)) {
-
-                        case 'CREAR':
-                            Auth::requireRole(['ADMIN', 'GERENTE']);
-                            $controller->crear();
-                            break;
-
-                        case 'GUARDAR':
-                            Auth::requireRole(['ADMIN', 'GERENTE']);
-                            $controller->guardar();
-                            break;
-
-                        case 'VER':
-                            $controller->listar();
-                            break;
-
-                        case 'EDITAR':
-                            Auth::requireRole(['ADMIN', 'GERENTE']);
-                            $controller->editar($partes[2] ?? null);
-                            break;
-
-                        case 'ACTUALIZAR':
-                            Auth::requireRole(['ADMIN', 'GERENTE']);
-                            $controller->actualizar();
-                            break;
-
-                        case 'ELIMINAR':
-                            Auth::requireRole(['ADMIN']);
-                            $controller->eliminar($partes[2] ?? null);
-                            break;
-                    }
-                }
-                break;
-
-            // ---------------------
-            // PRODUCTOS
-            // ---------------------
-            case 'PRODUCTOS':
-                $controller = new ProductoController($this->conn);
-
-                if (!$param1) {
-                    $controller->index();
-                } else {
-                    switch (strtoupper($param1)) {
-
-                        case 'CREAR':
-                            Auth::requireRole(['ADMIN', 'INVENTARIO']);
-                            $controller->crear();
-                            break;
-
-                        case 'GUARDAR':
-                            Auth::requireRole(['ADMIN', 'INVENTARIO']);
-                            $controller->guardar();
-                            break;
-
-                        case 'VER':
-                            $controller->listar();
-                            break;
-
-                        case 'EDITAR':
-                            Auth::requireRole(['ADMIN', 'INVENTARIO']);
-                            $controller->editar($partes[2] ?? null);
-                            break;
-
-                        case 'ACTUALIZAR':
-                            Auth::requireRole(['ADMIN', 'INVENTARIO']);
-                            $controller->actualizar();
-                            break;
-
-                        case 'ELIMINAR':
-                            Auth::requireRole(['ADMIN']);
-                            $controller->eliminar($partes[2] ?? null);
-                            break;
-                    }
-                }
-                break;
-
-            // ---------------------
-            // ERROR 404
-            // ---------------------
-            default:
-                echo "<h2>404 - Ruta no encontrada</h2>";
-                break;
+        // 4. Validar si la sub-acción existe, si no, usar INDEX por defecto o error
+        if (!array_key_exists($accion, $actions)) {
+            // Si la acción no existe, y es una URL base (ej: /PRODUCTOS), forzamos INDEX
+            if ($accion === 'INDEX' || !isset($partes[1])) {
+                $accion = 'INDEX';
+            } else {
+                // Si puso /PRODUCTOS/ALGO_RARO
+                $this->sendNotFound(); 
+                return;
+            }
         }
+        
+        // (Doble check por si forzamos INDEX arriba y no existe en config)
+        if (!isset($actions[$accion])) {
+            $this->sendNotFound();
+            return;
+        }
+
+        $actionConfig = $actions[$accion];
+
+        // 5. Verificación de Seguridad (Middleware Simplificado)
+        $isPublic = isset($routeConfig['public']) && $routeConfig['public'] 
+                    || isset($actionConfig['public']) && $actionConfig['public'];
+
+        if (!$isPublic) {
+            Auth::check(); // Verifica login
+
+            // Verifica Roles
+            if (isset($actionConfig['roles']) && !empty($actionConfig['roles'])) {
+                Auth::requireRole($actionConfig['roles']);
+            }
+        }
+
+        // 6. Instanciar y Ejecutar
+        $controllerName = $routeConfig['controller'];
+        $method = $actionConfig['method'];
+
+        if (class_exists($controllerName)) {
+            // Inyectamos conexión si el constructor la pide (simple DI)
+            // Asumimos que todos nuestros controladores reciben $conn, excepto InicioController quizá?
+            // Haremos un chequeo simple o pasamos $conn siempre que podamos.
+            // Para ser robustos, pasamos $conn siempre. Los controladores que no lo usen, pueden ignorarlo o no declararlo en __construct si no extienden nada.
+            // Pero InicioController NO tiene constructor con $conn en mi implementacion previa.
+            // Solución: Reflection o Try/Catch? No, solución simple:
+            // Todo controller recibe $conn?
+            // InicioController: No.
+            // Otros: Si.
+            // Haremos un "dirty check" o estandarizamos que todos reciban $conn?
+            // Estandarizar es mejor, pero modifiquemos la instanciación.
+            
+            if ($controllerName === 'App\Controllers\InicioController') {
+                $controller = new $controllerName();
+            } else {
+                $controller = new $controllerName($this->conn);
+            }
+
+            if (method_exists($controller, $method)) {
+                // Pasamos el ID solo si el método lo espera? 
+                // PHP permite pasar argumentos extra, no pasa nada.
+                $controller->$method($id);
+            } else {
+                $this->sendNotFound();
+            }
+        } else {
+            $this->sendNotFound();
+        }
+    }
+
+    private function sendNotFound() {
+        http_response_code(404);
+        require __DIR__ . '/views/errors/generic.php'; 
+        // Nota: Podriamos tener un 404 especifico, pero el generico sirve si le pasamos variables.
+        // O simplemente echo "404"; como antes, pero mejor usar la vista.
+        // Pero generic.php espera $message. Forzemos variables antes de require o usemos una simple.
+        echo "<div class='container mt-5'><div class='alert alert-warning text-center'><h1>404</h1><p>Ruta no encontrada.</p><a href='/INICIO' class='btn btn-primary'>Ir al Inicio</a></div></div>";
     }
 }
