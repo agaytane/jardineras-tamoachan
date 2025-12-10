@@ -5,7 +5,7 @@ use App\Models\EmpleadoModel;
 
 class EmpleadoController {
     private $modelo;
-    public function __construct($conn) {
+    public function __construct(\PDO $conn) {
         $this->modelo = new EmpleadoModel($conn);
     }
     public function index() {

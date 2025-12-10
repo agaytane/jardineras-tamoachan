@@ -2,6 +2,7 @@
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/../vendor/autoload.php';
 
+use App\Container;
 use App\Router;
 
 session_start();
@@ -15,9 +16,20 @@ $url = isset($_GET['url'])
     : '';
 
 // =======================================================
+// CONTENEDOR DE DEPENDENCIAS
+// =======================================================
+$container = new Container();
+
+// Registramos la conexión PDO en el contenedor
+$container->set(PDO::class, function() use ($conn) {
+    return $conn;
+});
+
+// =======================================================
 // INSTANCIAR ROUTER Y DESPACHAR
 // =======================================================
-$router = new Router($conn);
+// El Router ahora recibe el Container, no la conexión directa
+$router = new Router($container);
 $router->dispatch($url);
 
 // =======================================================

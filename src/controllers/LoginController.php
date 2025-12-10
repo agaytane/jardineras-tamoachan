@@ -7,7 +7,7 @@ class LoginController {
 
     private $model;
 
-    public function __construct($conn) {
+    public function __construct(\PDO $conn) {
         $this->model = new UsuarioModel($conn);
     }
 

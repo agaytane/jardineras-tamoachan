@@ -8,7 +8,7 @@ class ProductoController {
 
     private $modelo;
 
-    public function __construct($conn) {
+    public function __construct(\PDO $conn) {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }

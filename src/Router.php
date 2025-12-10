@@ -10,10 +10,10 @@ use App\Controllers\ProductoController;
 
 class Router {
     
-    private $conn;
+    private $container;
 
-    public function __construct($conn) {
-        $this->conn = $conn;
+    public function __construct(Container $container) {
+        $this->container = $container;
     }
 
     public function dispatch($url) {
@@ -70,35 +70,24 @@ class Router {
             }
         }
 
-        // 6. Instanciar y Ejecutar
+        // 6. Instanciar y Ejecutar (USANDO DI CONTAINER)
         $controllerName = $routeConfig['controller'];
         $method = $actionConfig['method'];
 
         if (class_exists($controllerName)) {
-            // Inyectamos conexión si el constructor la pide (simple DI)
-            // Asumimos que todos nuestros controladores reciben $conn, excepto InicioController quizá?
-            // Haremos un chequeo simple o pasamos $conn siempre que podamos.
-            // Para ser robustos, pasamos $conn siempre. Los controladores que no lo usen, pueden ignorarlo o no declararlo en __construct si no extienden nada.
-            // Pero InicioController NO tiene constructor con $conn en mi implementacion previa.
-            // Solución: Reflection o Try/Catch? No, solución simple:
-            // Todo controller recibe $conn?
-            // InicioController: No.
-            // Otros: Si.
-            // Haremos un "dirty check" o estandarizamos que todos reciban $conn?
-            // Estandarizar es mejor, pero modifiquemos la instanciación.
-            
-            if ($controllerName === 'App\Controllers\InicioController') {
-                $controller = new $controllerName();
-            } else {
-                $controller = new $controllerName($this->conn);
-            }
+            try {
+                // EL CONTENEDOR RESUELVE DEPENDENCIAS MAGICAMENTE ✨
+                $controller = $this->container->resolve($controllerName);
 
-            if (method_exists($controller, $method)) {
-                // Pasamos el ID solo si el método lo espera? 
-                // PHP permite pasar argumentos extra, no pasa nada.
-                $controller->$method($id);
-            } else {
-                $this->sendNotFound();
+                if (method_exists($controller, $method)) {
+                    $controller->$method($id);
+                } else {
+                    $this->sendNotFound();
+                }
+            } catch (\Exception $e) {
+                // Error de resolución de dependencias u otro
+                http_response_code(500);
+                echo "Error interno: " . $e->getMessage();
             }
         } else {
             $this->sendNotFound();
