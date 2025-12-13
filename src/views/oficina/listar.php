@@ -22,10 +22,6 @@
                 <td><?= $o['Ciudad'] ?></td>
                 <td><?= $o['Telefono'] ?></td>
                 <td><?= $o['Codigo_postal'] ?></td>
-                <td>
-                    <a href="/OFICINA/EDITAR/<?= $o['Id_oficina'] ?>" class="btn btn-warning btn-sm">✏️</a>
-                    <a href="/OFICINA/ELIMINAR/<?= $o['Id_oficina'] ?>" class="btn btn-danger btn-sm">🗑️</a>
-                </td>
             </tr>
         <?php endforeach; ?>
         </tbody>

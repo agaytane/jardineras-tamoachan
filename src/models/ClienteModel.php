@@ -4,93 +4,69 @@ class ClienteModel {
 
     public function __construct($conn) {
         $this->conn = $conn;
+        $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
 
-    // ✅ LISTAR
+    /* =========================
+       LISTAR CLIENTES
+    ========================== */
     public function listar() {
-        try {
-            $sql = "SELECT * FROM CLIENTE";
-            $stmt = $this->conn->prepare($sql);
-            $stmt->execute();
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            return [];
-        }
+        $stmt = $this->conn->prepare("EXEC SP_LISTAR_CLIENTES");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    // ✅ OBTENER POR ID
+
+    /* =========================
+       OBTENER CLIENTE
+    ========================== */
     public function obtener($id) {
-        try {
-            $sql = "SELECT * FROM CLIENTE WHERE Id_cliente = :id";
-            $stmt = $this->conn->prepare($sql);
-            $stmt->bindParam(":id", $id, PDO::PARAM_INT);
-            $stmt->execute();
-            return $stmt->fetch(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            return false;
-        }
+        $stmt = $this->conn->prepare("EXEC SP_OBTENER_CLIENTE :id");
+        $stmt->bindParam(":id", $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
-    /* =========================================
+
+    /* =========================
        INSERTAR CLIENTE
-    ========================================== */
+    ========================== */
     public function insertar($data) {
-        try {
-            $sql = "EXEC SP_INSERTAR_CLIENTE 
-                :id, :nom, :ape, :email, :tel, :dir";
+        $stmt = $this->conn->prepare(
+            "EXEC SP_INSERTAR_CLIENTE 
+             :nom, :ape, :email, :tel, :dir"
+        );
 
-            $stmt = $this->conn->prepare($sql);
-
-            $stmt->bindParam(":id",    $data['Id_cliente']);
-            $stmt->bindParam(":nom",   $data['Nombre_cte']);
-            $stmt->bindParam(":ape",   $data['Apellido_cte']);
-            $stmt->bindParam(":email", $data['Email_cte']);
-            $stmt->bindParam(":tel",   $data['Telefono_cte']);
-            $stmt->bindParam(":dir",   $data['Direccion_cte']);
-
-            return $stmt->execute();
-
-        } catch (PDOException $e) {
-            return false;
-        }
+        return $stmt->execute([
+            ':nom'   => $data['Nombre_cte'],
+            ':ape'   => $data['Apellido_cte'],
+            ':email' => $data['Email_cte'],
+            ':tel'   => $data['Telefono_cte'],
+            ':dir'   => $data['Direccion_cte']
+        ]);
     }
 
-    /* =========================================
+    /* =========================
        ACTUALIZAR CLIENTE
-    ========================================== */
+    ========================== */
     public function actualizar($data) {
-        try {
-            $sql = "EXEC SP_ACTUALIZAR_CLIENTE 
-                :id, :nom, :ape, :email, :tel, :dir";
+        $stmt = $this->conn->prepare(
+            "EXEC SP_ACTUALIZAR_CLIENTE 
+             :id, :email, :tel, :dir"
+        );
 
-            $stmt = $this->conn->prepare($sql);
-
-            $stmt->bindParam(":id",    $data['Id_cliente']);
-            $stmt->bindParam(":nom",   $data['Nombre_cte']);
-            $stmt->bindParam(":ape",   $data['Apellido_cte']);
-            $stmt->bindParam(":email", $data['Email_cte']);
-            $stmt->bindParam(":tel",   $data['Telefono_cte']);
-            $stmt->bindParam(":dir",   $data['Direccion_cte']);
-
-            return $stmt->execute();
-
-        } catch (PDOException $e) {
-            return false;
-        }
+        return $stmt->execute([
+            ':id'    => $data['Id_cliente'],
+            ':email' => $data['Email_cte'],
+            ':tel'   => $data['Telefono_cte'],
+            ':dir'   => $data['Direccion_cte']
+        ]);
     }
 
-    /* =========================================
+    /* =========================
        ELIMINAR CLIENTE
-    ========================================== */
+    ========================== */
     public function eliminar($id) {
-        try {
-            $sql = "EXEC SP_ELIMINAR_CLIENTE :id";
-
-            $stmt = $this->conn->prepare($sql);
-            $stmt->bindParam(":id", $id, PDO::PARAM_INT);
-
-            return $stmt->execute();
-
-        } catch (PDOException $e) {
-            return false;
-        }
+        $stmt = $this->conn->prepare("EXEC SP_ELIMINAR_CLIENTE :id");
+        $stmt->bindParam(":id", $id, PDO::PARAM_INT);
+        return $stmt->execute();
     }
 }

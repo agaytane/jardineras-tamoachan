@@ -9,92 +9,119 @@ class ProductoController {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
+
+        if (!isset($_SESSION['usuario'])) {
+            header("Location: /LOGIN");
+            exit;
+        }
+
         $this->modelo = new ProductoModel($conn);
     }
 
-    // ========================
-    // PANTALLA PRINCIPAL
-    // ========================
     public function index() {
         $ruta = "PRODUCTOS";
         $titulo = "Productos";
         require __DIR__ . '/../views/producto/index.php';
     }
-
-    // ========================
-    // LISTAR — TODOS PUEDEN
-    // ========================
     public function listar() {
         $productos = $this->modelo->listar();
         require __DIR__ . '/../views/producto/listar.php';
     }
-
-    // ========================
-    // CREAR — ADMIN, GERENTE
-    // ========================
     public function crear() {
-        requireRole(['ADMIN', 'GERENTE']);
+    requireRole(['ADMIN', 'GERENTE']);
+
+    // 1️⃣ MOSTRAR FORMULARIO
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         require __DIR__ . '/../views/producto/crear.php';
+        return;
     }
 
-    public function guardar() {
-        requireRole(['ADMIN', 'GERENTE']);
-
-        if ($_POST) {
-            $this->modelo->insertar($_POST);
-            header("Location: /PRODUCTOS");
-        }
+    // 2️⃣ PROCESAR FORMULARIO (POST)
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        header("Location: /PRODUCTOS");
+        exit;
     }
 
-    // ========================
-    // EDITAR — ADMIN, GERENTE
-    // ========================
+    // 3️⃣ VALIDACIONES
+    if (
+        empty($_POST['nombre']) ||
+        !isset($_POST['precio_venta']) ||
+        !isset($_POST['stock']) ||
+        $_POST['precio_venta'] < 0 ||
+        $_POST['stock'] < 0
+    ) {
+        die("❌ Datos inválidos");
+    }
+
+    // 4️⃣ LIMPIAR DATOS
+    $data = [
+        'nombre'        => trim($_POST['nombre']),
+        'descripcion'   => trim($_POST['descripcion'] ?? ''),
+        'precio_venta'  => (float) $_POST['precio_venta'],
+        'stock'         => (int) $_POST['stock'],
+        'fk_id_gama'    => !empty($_POST['fk_id_gama']) ? (int) $_POST['fk_id_gama'] : null
+    ];
+    // 5️⃣ INSERTAR
+    $this->modelo->insertar($data);
+    // 6️⃣ REDIRECCIÓN
+    header("Location: /PRODUCTOS");
+    exit;
+}
     public function editar($id = null) {
-
         requireRole(['ADMIN', 'GERENTE']);
 
-        // Si viene del formulario POST
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = $_POST['id'] ?? null;
         }
 
-        // Sin ID → pedir ID
         if (!$id) {
             require __DIR__ . '/../views/producto/seleccionar_editar.php';
             return;
         }
 
-        // Buscar producto
         $producto = $this->modelo->obtener($id);
 
         if (!$producto) {
-            echo "<div class='alert alert-danger mt-4'>❌ Producto no encontrado</div>";
-            echo "<a href='/PRODUCTOS/EDITAR' class='btn btn-secondary mt-2'>Intentar otro ID</a>";
-            return;
+            die("❌ Producto no encontrado");
         }
 
         require __DIR__ . '/../views/producto/editar.php';
     }
 
-    // ========================
-    // ACTUALIZAR — ADMIN, GERENTE
-    // ========================
     public function actualizar() {
         requireRole(['ADMIN', 'GERENTE']);
 
-        if ($_POST) {
-            $this->modelo->actualizar($_POST);
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header("Location: /PRODUCTOS");
+            exit;
         }
+
+        if (
+            empty($_POST['id_producto']) ||
+            $_POST['precio_venta'] < 0 ||
+            $_POST['stock'] < 0
+        ) {
+            die("❌ Datos inválidos");
+        }
+
+        $data = [
+            'id_producto'   => (int) $_POST['id_producto'],
+            'nombre'        => trim($_POST['nombre']),
+            'descripcion'   => trim($_POST['descripcion'] ?? ''),
+            'precio_venta'  => (float) $_POST['precio_venta'],
+            'stock'         => (int) $_POST['stock'],
+            'fk_id_gama'    => !empty($_POST['fk_id_gama']) ? (int) $_POST['fk_id_gama'] : null
+        ];
+
+        $this->modelo->actualizar($data);
+
         header("Location: /PRODUCTOS");
+        exit;
     }
 
-    // ========================
-    // ELIMINAR — SOLO ADMIN
-    // ========================
     public function eliminar($id = null) {
         requireRole(['ADMIN']);
 
-        // Si viene por POST
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = $_POST['id'] ?? null;
         }
@@ -104,15 +131,13 @@ class ProductoController {
             return;
         }
 
-        $producto = $this->modelo->obtener($id);
-
-        if (!$producto) {
-            echo "<div class='alert alert-danger'>❌ Producto no encontrado</div>";
-            echo "<a href='/PRODUCTOS/ELIMINAR' class='btn btn-secondary'>Intentar otro</a>";
-            return;
+        if (!$this->modelo->obtener($id)) {
+            die("❌ Producto no encontrado");
         }
 
         $this->modelo->eliminar($id);
+
         header("Location: /PRODUCTOS");
+        exit;
     }
 }

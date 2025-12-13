@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../models/ClienteModel.php';
-require_once __DIR__ . '/../helpers/auth.php';//mensajes de error y validaciones para required roles
+require_once __DIR__ . '/../helpers/auth.php';
 
 class ClienteController {
     private $modelo;
@@ -9,109 +9,149 @@ class ClienteController {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
+
+        if (!isset($_SESSION['usuario'])) {
+            header("Location: /LOGIN");
+            exit;
+        }
+
         $this->modelo = new ClienteModel($conn);
     }
-    // ================================
-    // PANTALLA PRINCIPAL CLIENTES
-    // ================================
+
+    /* =========================
+       INDEX
+    ========================== */
     public function index() {
         $ruta = "CLIENTES";
         $titulo = "Clientes";
         require __DIR__ . '/../views/cliente/index.php';
     }
-    // ================================
-    // LISTAR — SIN RESTRICCIONES
-    // ================================
+
+    /* =========================
+       LISTAR
+    ========================== */
     public function listar() {
         $clientes = $this->modelo->listar();
         require __DIR__ . '/../views/cliente/listar.php';
     }
-    // ================================
-    // CREAR — ADMIN, GERENTE
-    // ================================
+
+    /* =========================
+       CREAR
+    ========================== */
     public function crear() {
         requireRole(['ADMIN', 'GERENTE']);
-        require __DIR__ . '/../views/cliente/crear.php';
-    }
 
-    public function guardar() {
-        requireRole(['ADMIN', 'GERENTE']);
-
-        if ($_POST) {
-            $this->modelo->insertar($_POST);
+        // 1️⃣ Mostrar formulario
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            require __DIR__ . '/../views/cliente/crear.php';
+            return;
         }
+        // 2️⃣ Procesar POST
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header("Location: /CLIENTES");
+            exit;
+        }
+
+        // 3️⃣ Validaciones
+        if (
+            empty($_POST['Nombre_cte']) ||
+            empty($_POST['Apellido_cte']) ||
+            empty($_POST['Email_cte'])
+        ) {
+            die("❌ Datos inválidos");
+        }
+
+        // 4️⃣ Limpiar datos
+        $data = [
+            'Nombre_cte'    => trim($_POST['Nombre_cte']),
+            'Apellido_cte'  => trim($_POST['Apellido_cte']),
+            'Email_cte'     => trim($_POST['Email_cte']),
+            'Telefono_cte'  => trim($_POST['Telefono_cte'] ?? ''),
+            'Direccion_cte' => trim($_POST['Direccion_cte'] ?? '')
+        ];
+
+        // 5️⃣ Insertar
+        $this->modelo->insertar($data);
+
+        // 6️⃣ Redirigir
         header("Location: /CLIENTES");
+        exit;
     }
 
-    // ================================
-    // EDITAR — ADMIN, GERENTE
-    // ================================
+    /* =========================
+       EDITAR
+    ========================== */
     public function editar($id = null) {
         requireRole(['ADMIN', 'GERENTE']);
 
-        // Si viene vía formulario
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = $_POST['id'] ?? null;
         }
 
-        // Si no mandaron ID → pedirlo
         if (!$id) {
             require __DIR__ . '/../views/cliente/seleccionar_editar.php';
             return;
         }
 
-        // Cargar cliente
         $cliente = $this->modelo->obtener($id);
-        // Si no existe id de cliente
+
         if (!$cliente) {
-            echo "<div class='alert alert-danger mt-3'>❌ Cliente no encontrado</div>";
-            echo "<a href='/CLIENTES/EDITAR' class='btn btn-secondary mt-2'>Intentar otro</a>";
-            return;
+            die("❌ Cliente no encontrado");
         }
 
         require __DIR__ . '/../views/cliente/editar.php';
     }
-    // ================================
-    // ACTUALIZAR — ADMIN, GERENTE
-    // ================================
+
+    /* =========================
+       ACTUALIZAR
+    ========================== */
     public function actualizar() {
         requireRole(['ADMIN', 'GERENTE']);
 
-        if ($_POST) {
-            $this->modelo->actualizar($_POST);
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header("Location: /CLIENTES");
+            exit;
         }
 
+        if (empty($_POST['Id_cliente'])) {
+            die("❌ Datos inválidos");
+        }
+
+        $data = [
+            'Id_cliente'    => (int) $_POST['Id_cliente'],
+            'Email_cte'     => trim($_POST['Email_cte']),
+            'Telefono_cte'  => trim($_POST['Telefono_cte']),
+            'Direccion_cte' => trim($_POST['Direccion_cte'])
+        ];
+
+        $this->modelo->actualizar($data);
+
         header("Location: /CLIENTES");
+        exit;
     }
-    // ================================
-    // ELIMINAR — SOLO ADMIN
-    // ================================
+
+    /* =========================
+       ELIMINAR
+    ========================== */
     public function eliminar($id = null) {
         requireRole(['ADMIN']);
 
-        // Si viene desde formulario
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = $_POST['id'] ?? null;
         }
 
-        // Si no viene ID → pantalla para pedirlo
         if (!$id) {
             require __DIR__ . '/../views/cliente/seleccionar_eliminar.php';
             return;
         }
 
-        // Buscar cliente
-        $cliente = $this->modelo->obtener($id);
-
-        if (!$cliente) {
-            echo "<div class='alert alert-danger mt-3'>❌ Cliente no encontrado</div>";
-            echo "<a href='/CLIENTES/ELIMINAR' class='btn btn-secondary mt-2'>Intentar otro</a>";
-            return;
+        if (!$this->modelo->obtener($id)) {
+            die("❌ Cliente no encontrado");
         }
 
-        // Eliminar
         $this->modelo->eliminar($id);
 
         header("Location: /CLIENTES");
+        exit;
     }
 }

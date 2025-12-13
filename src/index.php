@@ -127,11 +127,6 @@ switch ($accion) {
                     $controller->crear();
                     break;
 
-                case 'GUARDAR':
-                    requireRole(['ADMIN', 'GERENTE']);
-                    $controller->guardar();
-                    break;
-
                 case 'VER':
                     $controller->listar();
                     break;
@@ -158,45 +153,42 @@ switch ($accion) {
     // PRODUCTOS
     // ---------------------
     case 'PRODUCTOS':
-        require_once __DIR__ . '/controllers/Ctrl_Producto.php';
-        $controller = new ProductoController($conn);
+    require_once __DIR__ . '/controllers/Ctrl_Producto.php';
+    $controller = new ProductoController($conn);
 
-        if (!$param1) {
-            $controller->index();
-        } else {
-            switch (strtoupper($param1)) {
-
-                case 'CREAR':
-                    requireRole(['ADMIN', 'INVENTARIO']);
-                    $controller->crear();
-                    break;
-
-                case 'GUARDAR':
-                    requireRole(['ADMIN', 'INVENTARIO']);
-                    $controller->guardar();
-                    break;
-
-                case 'VER':
-                    $controller->listar();
-                    break;
-
-                case 'EDITAR':
-                    requireRole(['ADMIN', 'INVENTARIO']);
-                    $controller->editar($partes[2] ?? null);
-                    break;
-
-                case 'ACTUALIZAR':
-                    requireRole(['ADMIN', 'INVENTARIO']);
-                    $controller->actualizar();
-                    break;
-
-                case 'ELIMINAR':
-                    requireRole(['ADMIN']);
-                    $controller->eliminar($partes[2] ?? null);
-                    break;
-            }
-        }
+    if (!$param1) {
+        $controller->index();
         break;
+    }
+    switch (strtoupper($param1)) {
+        case 'CREAR':
+            requireRole(['ADMIN', 'GERENTE']);
+            $controller->crear();
+            break;
+        case 'LISTAR':
+            $controller->listar();
+            break;
+        case 'VER': // alias opcional
+            $controller->listar();
+            break;
+        case 'EDITAR':
+            requireRole(['ADMIN', 'GERENTE']);
+            $controller->editar($partes[2] ?? null);
+            break;
+        case 'ACTUALIZAR':
+            requireRole(['ADMIN', 'GERENTE']);
+            $controller->actualizar();
+            break;
+        case 'ELIMINAR':
+            requireRole(['ADMIN']);
+            $controller->eliminar($partes[2] ?? null);
+            break;
+        default:
+            header("HTTP/1.0 404 Not Found");
+            echo "<h3>❌ Acción no válida en PRODUCTOS</h3>";
+            break;
+    }
+    break;
 
     // ---------------------
     // ERROR 404
