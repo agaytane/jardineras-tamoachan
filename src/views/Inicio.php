@@ -21,7 +21,7 @@
 
             <div class="botones">
                 <a href="/OFICINAS" class="btn-jardin">🏢 Oficinas</a>
-                <a href="/GAMAS" class="btn-jardin">🏷️ Gamas</a>
+                <a href="/GAMA" class="btn-jardin">🏷️ Gamas</a>
             </div>
 
             <div class="seccion-titulo">

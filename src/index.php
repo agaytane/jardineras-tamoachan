@@ -82,11 +82,6 @@ switch ($accion) {
                     $controller->crear();
                     break;
 
-                case 'GUARDAR':
-                    requireRole(['ADMIN', 'GERENTE']);
-                    $controller->guardar();
-                    break;
-
                 case 'VER':
                     requireRole(['ADMIN', 'GERENTE']);
                     $controller->listar();
@@ -109,6 +104,119 @@ switch ($accion) {
             }
         }
         break;
+    // ---------------------
+// GAMA
+// ---------------------
+case 'GAMA':
+    require_once __DIR__ . '/controllers/Ctrl_Gama.php';
+    $controller = new GamaController(conn: $conn);
+
+    if (!$param1) {
+        $controller->index();
+    } else {
+        switch (strtoupper($param1)) {
+            case 'VER':
+                requireRole(['ADMIN', 'GERENTE']);
+                $controller->listar();
+                break;
+
+            case 'CREAR':
+                requireRole(['ADMIN', 'INVENTARIO']);
+                $controller->crear();
+                break;
+
+            case 'EDITAR':
+                requireRole(['ADMIN', 'INVENTARIO']);
+                $controller->editar($partes[2] ?? null);
+                break;
+
+            case 'ACTUALIZAR':
+                requireRole(['ADMIN', 'INVENTARIO']);
+                $controller->actualizar();
+                break;
+
+            case 'ELIMINAR':
+                requireRole(['ADMIN']);
+                $controller->eliminar($partes[2] ?? null);
+                break;
+        }
+    }
+    break;
+    // ---------------------
+// OFICINAS
+// ---------------------
+case 'OFICINAS':
+    require_once __DIR__ . '/controllers/Ctrl_Oficina.php';
+    $controller = new OficinaController($conn);
+
+    if (!$param1) {
+        $controller->index();
+    } else {
+        switch (strtoupper($param1)) {
+
+            case 'VER':
+                requireRole(['ADMIN', 'GERENTE']);
+                $controller->listar();
+                break;
+
+            case 'CREAR':
+                requireRole(['ADMIN', 'GERENTE']);
+                $controller->crear();
+                break;
+
+
+            case 'EDITAR':
+                requireRole(['ADMIN', 'GERENTE']);
+                $controller->editar($partes[2] ?? null);
+                break;
+
+            case 'ACTUALIZAR':
+                requireRole(['ADMIN', 'GERENTE']);
+                $controller->actualizar();
+                break;
+
+            case 'ELIMINAR':
+                requireRole(['ADMIN']);
+                $controller->eliminar($partes[2] ?? null);
+                break;
+        }
+    }
+    break;
+    // ---------------------
+// PEDIDOS
+// ---------------------
+case 'PEDIDOS':
+    require_once __DIR__ . '/controllers/Ctrl_Pedido.php';
+    $controller = new PedidoController($conn);
+
+    if (!$param1) {
+        $controller->index();
+    } else {
+        switch (strtoupper($param1)) {
+            
+            case 'VER':
+                requireRole(['ADMIN', 'GERENTE']);
+                $controller->listar();
+                break;
+
+            case 'CREAR':
+                requireRole(['ADMIN', 'VENTAS']);
+                $controller->crear();
+                break;
+
+            case 'CANCELAR':
+                requireRole(['ADMIN', 'VENTAS']);
+                $controller->cancelar($partes[2] ?? null);
+                break;
+
+            case 'ELIMINAR':
+                requireRole(['ADMIN']);
+                $controller->eliminar($partes[2] ?? null);
+                break;
+        }
+    }
+    break;
+
 
     // ---------------------
     // CLIENTES

@@ -1,59 +1,144 @@
 <?php
-require_once '../models/GamaModel.php';
+require_once __DIR__ . '/../models/GamaModel.php';
+require_once __DIR__ . '/../helpers/auth.php';
 
 class GamaController {
     private $modelo;
 
     public function __construct($conn) {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        if (!isset($_SESSION['usuario'])) {
+            header("Location: /LOGIN");
+            exit;
+        }
+
         $this->modelo = new GamaModel($conn);
     }
 
+    /* =========================
+       INDEX
+    ========================== */
     public function index() {
+        $ruta = "GAMA";
+        $titulo = "Gamas";
+        require __DIR__ . '/../views/gama/index.php';
+    }
+
+    /* =========================
+       LISTAR
+    ========================== */
+    public function listar() {
         $gamas = $this->modelo->listar();
-        require '../views/gama/index.php';
+        require __DIR__ . '/../views/gama/listar.php';
     }
 
+    /* =========================
+       CREAR
+    ========================== */
     public function crear() {
-        require '../views/gama/crear.php';
-    }
+        requireRole(['ADMIN', 'GERENTE']);
 
-    public function guardar() {
-        if ($_POST) {
-            $this->modelo->insertar($_POST);
-            header("Location: /GAMA");
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            require __DIR__ . '/../views/gama/crear.php';
+            return;
         }
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header("Location: /GAMA");
+            exit;
+        }
+
+        if (empty($_POST['Nombre_gama'])) {
+            die("❌ Datos inválidos");
+        }
+
+        $data = [
+            'Nombre_gama'      => trim($_POST['Nombre_gama']),
+            'Descripcion_gama' => trim($_POST['Descripcion_gama'] ?? '')
+        ];
+
+        $this->modelo->insertar($data);
+
+        header("Location: /GAMA");
+        exit;
     }
 
+    /* =========================
+       EDITAR
+    ========================== */
     public function editar($id = null) {
+        requireRole(['ADMIN', 'GERENTE']);
 
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $id = $_POST['id'] ?? null;
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $id = $_POST['id'] ?? null;
+        }
+
+        if (!$id) {
+            require __DIR__ . '/../views/gama/seleccionar_editar.php';
+            return;
+        }
+
+        $gama = $this->modelo->obtener($id);
+
+        if (!$gama) {
+            die("❌ Gama no encontrada");
+        }
+
+        require __DIR__ . '/../views/gama/editar.php';
     }
 
-    if (!$id) {
-        require __DIR__ . '/../views/gama/seleccionar_editar.php';
-        return;
-    }
-
-    $gama = $this->modelo->obtener($id);
-
-    if (!$gama) {
-        echo "<div class='alert alert-danger'>Gama no encontrada</div>";
-        echo "<a href='/GAMA/EDITAR' class='btn btn-secondary'>Intentar otro</a>";
-        return;
-    }
-
-    require __DIR__ . '/../views/gama/editar.php';
-}
-
-
+    /* =========================
+       ACTUALIZAR
+    ========================== */
     public function actualizar() {
-        $this->modelo->actualizar($_POST);
+        requireRole(['ADMIN', 'GERENTE']);
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header("Location: /GAMA");
+            exit;
+        }
+
+        if (empty($_POST['Id_gama'])) {
+            die("❌ Datos inválidos");
+        }
+
+        $data = [
+            'Id_gama'          => (int) $_POST['Id_gama'],
+            'Nombre_gama'      => trim($_POST['Nombre_gama']),
+            'Descripcion_gama' => trim($_POST['Descripcion_gama'])
+        ];
+
+        $this->modelo->actualizar($data);
+
         header("Location: /GAMA");
+        exit;
     }
 
-    public function eliminar($id) {
+    /* =========================
+       ELIMINAR
+    ========================== */
+    public function eliminar($id = null) {
+        requireRole(['ADMIN']);
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $id = $_POST['id'] ?? null;
+        }
+
+        if (!$id) {
+            require __DIR__ . '/../views/gama/seleccionar_eliminar.php';
+            return;
+        }
+
+        if (!$this->modelo->obtener($id)) {
+            die("❌ Gama no encontrada");
+        }
+
         $this->modelo->eliminar($id);
+
         header("Location: /GAMA");
+        exit;
     }
 }

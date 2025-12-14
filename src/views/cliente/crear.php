@@ -1,22 +1,39 @@
-<h2>Nuevo Cliente</h2>
+<div class="container mt-5">
+    <h2 class="mb-4">Agregar Cliente</h2>
 
-<form method="POST" action="/CLIENTES/CREAR">
+    <form method="POST" action="/CLIENTES/GUARDAR">
 
-    <input type="text" name="Nombre_cte" class="form-control mb-2" placeholder="Nombre" required>
+        <div class="mb-3">
+            <label>ID Cliente</label>
+            <input type="number" name="Id_cliente" class="form-control" required>
+        </div>
 
-    <input type="text" name="Apellido_cte" class="form-control mb-2" placeholder="Apellido">
+        <div class="mb-3">
+            <label>Nombre</label>
+            <input type="text" name="Nombre_cte" class="form-control" required>
+        </div>
 
-    <input type="email" step="0.01" min="0"
-           name="Email_cte" class="form-control mb-2"
-           placeholder="Email" required>
+        <div class="mb-3">
+            <label>Apellido</label>
+            <input type="text" name="Apellido_cte" class="form-control" required>
+        </div>
 
-    <input type="number" min="0"
-           name="Telefono_cte" class="form-control mb-2"
-           placeholder="Teléfono" required>
+        <div class="mb-3">
+            <label>Email</label>
+            <input type="email" name="Email_cte" class="form-control">
+        </div>
 
-    <input type="text"
-           name="Direccion_cte" class="form-control mb-2"
-           placeholder="Dirección (opcional)">
+        <div class="mb-3">
+            <label>Teléfono</label>
+            <input type="text" name="Telefono_cte" class="form-control">
+        </div>
 
-    <button type="submit" class="btn btn-primary">Guardar</button>
-</form>
+        <div class="mb-3">
+            <label>Dirección</label>
+            <input type="text" name="Direccion_cte" class="form-control">
+        </div>
+
+        <button class="btn btn-success">Guardar</button>
+        <a href="/CLIENTES" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>

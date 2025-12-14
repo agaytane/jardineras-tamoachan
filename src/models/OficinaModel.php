@@ -5,85 +5,70 @@ class OficinaModel {
     public function __construct($conn) {
         $this->conn = $conn;
     }
+
+    /* =========================
+       LISTAR
+    ========================== */
     public function listar() {
-        try {
-            $sql = "SELECT * FROM OFICINA";
-            $stmt = $this->conn->prepare($sql);
-            $stmt->execute();
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            return [];
-        }
+        $sql = "EXEC SP_LISTAR_OFICINAS";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-
+    /* =========================
+       OBTENER
+    ========================== */
     public function obtener($id) {
-        try {
-            $sql = "EXEC SP_OBTENER_OFICINA :id";
-            $stmt = $this->conn->prepare($sql);
-            $stmt->bindParam(":id", $id, PDO::PARAM_INT);
-            $stmt->execute();
-            return $stmt->fetch(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            return false;
-        }
+        $sql = "EXEC SP_OBTENER_OFICINA :id";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(":id", $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    /* =========================
+       INSERTAR
+    ========================== */
     public function insertar($data) {
-        try {
-            $sql = "EXEC SP_INSERTAR_OFICINA 
-                    :id, :dir, :tel, :ciu, :pro, :cp";
-            $stmt = $this->conn->prepare($sql);
-            $stmt->bindParam(":id", $data['Id_oficina']);
-            $stmt->bindParam(":dir", $data['Direccion']);
-            $stmt->bindParam(":tel", $data['Telefono']);
-            $stmt->bindParam(":ciu", $data['Ciudad']);
-            $stmt->bindParam(":pro", $data['Provincia']);
-            $stmt->bindParam(":cp", $data['Codigo_postal']);
-            return $stmt->execute();
-        } catch (PDOException $e) {
-            return false;
-        }
+        $sql = "EXEC SP_INSERTAR_OFICINA 
+                :dir, :tel, :ciu, :pro, :cp";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(":dir", $data['Direccion']);
+        $stmt->bindParam(":tel", $data['Telefono']);
+        $stmt->bindParam(":ciu", $data['Ciudad']);
+        $stmt->bindParam(":pro", $data['Provincia']);
+        $stmt->bindParam(":cp",  $data['Codigo_postal']);
+
+        return $stmt->execute();
     }
 
-
-    /* =========================================
-       ACTUALIZAR OFICINA
-    ========================================== */
+    /* =========================
+       ACTUALIZAR
+    ========================== */
     public function actualizar($data) {
-        try {
-            $sql = "EXEC SP_ACTUALIZAR_OFICINA 
-                :id, :dir, :ciu, :tel, :pro, :cp";
+        $sql = "EXEC SP_ACTUALIZAR_OFICINA 
+                :id, :dir, :tel, :ciu, :pro, :cp";
 
-            $stmt = $this->conn->prepare($sql);
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(":id",  $data['Id_oficina'], PDO::PARAM_INT);
+        $stmt->bindParam(":dir", $data['Direccion']);
+        $stmt->bindParam(":tel", $data['Telefono']);
+        $stmt->bindParam(":ciu", $data['Ciudad']);
+        $stmt->bindParam(":pro", $data['Provincia']);
+        $stmt->bindParam(":cp",  $data['Codigo_postal']);
 
-            $stmt->bindParam(":id",    $data['Id_oficina']);
-            $stmt->bindParam(":dir",   $data['Direccion']);
-            $stmt->bindParam(":ciu",   $data['Ciudad']);
-            $stmt->bindParam(":tel",   $data['Telefono']);
-            $stmt->bindParam(":pro",   $data['Provincia']);
-            $stmt->bindParam(":cp",   $data['Codigo_postal']);
-            return $stmt->execute();
-
-        } catch (PDOException $e) {
-            return false;
-        }
+        return $stmt->execute();
     }
 
-    /* =========================================
-       ELIMINAR CLIENTE
-    ========================================== */
+    /* =========================
+       ELIMINAR
+    ========================== */
     public function eliminar($id) {
-        try {
-            $sql = "EXEC SP_ELIMINAR_CLIENTE :id";
-
-            $stmt = $this->conn->prepare($sql);
-            $stmt->bindParam(":id", $id, PDO::PARAM_INT);
-
-            return $stmt->execute();
-
-        } catch (PDOException $e) {
-            return false;
-        }
+        $sql = "EXEC SP_ELIMINAR_OFICINA :id";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(":id", $id, PDO::PARAM_INT);
+        return $stmt->execute();
     }
 }

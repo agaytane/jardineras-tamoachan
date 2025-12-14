@@ -5,111 +5,146 @@ require_once __DIR__ . '/../helpers/auth.php';
 class OficinaController {
     private $modelo;
 
-        public function __construct($conn) {
+    public function __construct($conn) {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
+
+        if (!isset($_SESSION['usuario'])) {
+            header("Location: /LOGIN");
+            exit;
+        }
+
         $this->modelo = new OficinaModel($conn);
     }
 
+    /* =========================
+       INDEX
+    ========================== */
     public function index() {
         $ruta = "OFICINAS";
         $titulo = "Oficinas";
         require __DIR__ . '/../views/oficina/index.php';
     }
 
-        public function listar() {
+    /* =========================
+       LISTAR
+    ========================== */
+    public function listar() {
         $oficinas = $this->modelo->listar();
         require __DIR__ . '/../views/oficina/listar.php';
     }
 
-    // ================================
-    // CREAR — ADMIN, GERENTE
-    // ================================
+    /* =========================
+       CREAR
+    ========================== */
     public function crear() {
         requireRole(['ADMIN', 'GERENTE']);
-        require __DIR__ . '/../views/oficina/crear.php';
-    }
 
-    public function guardar() {
-        requireRole(['ADMIN', 'GERENTE']);
-
-        if ($_POST) {
-            $this->modelo->insertar($_POST);
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            require __DIR__ . '/../views/oficina/crear.php';
+            return;
         }
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header("Location: /OFICINAS");
+            exit;
+        }
+
+        if (empty($_POST['Direccion']) || empty($_POST['Ciudad'])) {
+            die("❌ Datos inválidos");
+        }
+
+        $data = [
+            'Direccion'      => trim($_POST['Direccion']),
+            'Telefono'       => trim($_POST['Telefono'] ?? ''),
+            'Ciudad'         => trim($_POST['Ciudad']),
+            'Provincia'      => trim($_POST['Provincia']),
+            'Codigo_postal'  => trim($_POST['Codigo_postal'])
+        ];
+
+        $this->modelo->insertar($data);
+
         header("Location: /OFICINAS");
+        exit;
     }
 
-   // ================================
-    // EDITAR — ADMIN, GERENTE
-    // ================================
+    /* =========================
+       EDITAR
+    ========================== */
     public function editar($id = null) {
         requireRole(['ADMIN', 'GERENTE']);
 
-        // Si viene vía formulario
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = $_POST['id'] ?? null;
         }
 
-        // Si no mandaron ID → pedirlo
         if (!$id) {
             require __DIR__ . '/../views/oficina/seleccionar_editar.php';
             return;
         }
 
-        // Cargar oficina
         $oficina = $this->modelo->obtener($id);
-        // Si no existe id de oficina
+
         if (!$oficina) {
-            echo "<div class='alert alert-danger mt-3'>❌ Oficina no encontrada</div>";
-            echo "<a href='/OFICINAS/EDITAR' class='btn btn-secondary mt-2'>Intentar otro</a>";
-            return;
+            die("❌ Oficina no encontrada");
         }
 
         require __DIR__ . '/../views/oficina/editar.php';
     }
-    // ================================
-    // ACTUALIZAR — ADMIN, GERENTE
-    // ================================
+
+    /* =========================
+       ACTUALIZAR
+    ========================== */
     public function actualizar() {
         requireRole(['ADMIN', 'GERENTE']);
 
-        if ($_POST) {
-            $this->modelo->actualizar($_POST);
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header("Location: /OFICINAS");
+            exit;
         }
 
+        if (empty($_POST['Id_oficina'])) {
+            die("❌ Datos inválidos");
+        }
+
+        $data = [
+            'Id_oficina'     => (int) $_POST['Id_oficina'],
+            'Direccion'      => trim($_POST['Direccion']),
+            'Telefono'       => trim($_POST['Telefono']),
+            'Ciudad'         => trim($_POST['Ciudad']),
+            'Provincia'      => trim($_POST['Provincia']),
+            'Codigo_postal'  => trim($_POST['Codigo_postal'])
+        ];
+
+        $this->modelo->actualizar($data);
+
         header("Location: /OFICINAS");
+        exit;
     }
-    // ================================
-    // ELIMINAR — SOLO ADMIN
-    // ================================
+
+    /* =========================
+       ELIMINAR
+    ========================== */
     public function eliminar($id = null) {
         requireRole(['ADMIN']);
 
-        // Si viene desde formulario
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = $_POST['id'] ?? null;
         }
 
-        // Si no viene ID → pantalla para pedirlo
         if (!$id) {
-            require __DIR__ . '/../views/cliente/seleccionar_eliminar.php';
+            require __DIR__ . '/../views/oficina/seleccionar_eliminar.php';
             return;
         }
 
-        // Buscar oficina
-        $oficina = $this->modelo->obtener($id);
-
-        if (!$oficina) {
-            echo "<div class='alert alert-danger mt-3'>❌ Oficina no encontrada</div>";
-            echo "<a href='/OFICINA/ELIMINAR' class='btn btn-secondary mt-2'>Intentar otro</a>";
-            return;
+        if (!$this->modelo->obtener($id)) {
+            die("❌ Oficina no encontrada");
         }
 
-        // Eliminar
         $this->modelo->eliminar($id);
 
-        header("Location: /CLIENTES");
+        header("Location: /OFICINAS");
+        exit;
     }
-
 }
