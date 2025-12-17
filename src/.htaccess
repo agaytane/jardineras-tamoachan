@@ -1,12 +1,14 @@
-# .htaccess en /var/www/html
 <IfModule mod_rewrite.c>
-
 RewriteEngine On
-RewriteBase /
 
-# Si el archivo o carpeta no existe → mandar a index.php
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.+)$ index.php?url=$1 [QSA,L]
+# ✅ Permitir archivos reales (CSS, JS, imágenes)
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^ - [L]
 
+# ✅ Permitir directorios reales
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# ✅ Todo lo demás al router frontal
+RewriteRule ^ index.php [QSA,L]
 </IfModule>
