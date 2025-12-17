@@ -1,14 +1,15 @@
 <IfModule mod_rewrite.c>
-RewriteEngine On
-
-# ✅ Permitir archivos reales (CSS, JS, imágenes)
-RewriteCond %{REQUEST_FILENAME} -f
-RewriteRule ^ - [L]
-
-# ✅ Permitir directorios reales
-RewriteCond %{REQUEST_FILENAME} -d
-RewriteRule ^ - [L]
-
-# ✅ Todo lo demás al router frontal
-RewriteRule ^ index.php [QSA,L]
+    RewriteEngine On
+    Options -Indexes
+    
+    # ✅ Permitir archivos reales (CSS, JS, imágenes)
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^ - [L]
+    
+    # ✅ Permitir directorios reales
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+    
+    # ✅ Redirigir todo a index.php (URLs limpias)
+    RewriteRule ^ index.php [L]
 </IfModule>
