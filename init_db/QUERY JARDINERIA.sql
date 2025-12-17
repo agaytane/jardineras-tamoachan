@@ -44,7 +44,7 @@ CREATE TABLE PEDIDO (
 )
 GO
 CREATE TABLE GAMA_PRODUCTO(
-     Id_gama INT IDENTITY(1,1) PRIMARY KEY,
+    Id_gama INT IDENTITY(1,1) PRIMARY KEY,
     Nombre_gama VARCHAR(20),
     Descripcion_gama VARCHAR(40)
 )
@@ -1122,6 +1122,7 @@ VALUES
 (GETDATE(), DATEADD(DAY, 4, GETDATE()), NULL, 'Pendiente', 'Compra mayor', 14, 15),
 (GETDATE(), DATEADD(DAY, 6, GETDATE()), NULL, 'Pendiente', 'Pedido web', 15, 11);
 GO
+SELECT * FROM PEDIDO
 
 /* =========================
    7️⃣ DETALLE_PEDIDO

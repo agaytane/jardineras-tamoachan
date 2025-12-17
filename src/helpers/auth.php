@@ -1,13 +1,17 @@
 <?php
-function requireRole($rolesPermitidos = []) {
+function requireRole(array $rolesPermitidos = [])
+{
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
 
-    $rol = isset($_SESSION['rol']) ? strtoupper($_SESSION['rol']) : null;
+    $rol = $_SESSION['rol'] ?? null;
+    $rol = $rol ? strtoupper($rol) : null;
 
     if (!$rol || !in_array($rol, $rolesPermitidos)) {
-        require __DIR__ . "/../views/error/no_acceso.php";
+        // Marcar error y dejar que el router renderice
+        $_SESSION['error_code'] = 403;
+        header("Location: /ERROR/403");
         exit;
     }
 }

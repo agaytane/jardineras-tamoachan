@@ -297,6 +297,24 @@ case 'PEDIDOS':
             break;
     }
     break;
+    // ---------------------
+// ERRORES
+// ---------------------
+case 'ERROR':
+    $codigo = $param1 ?? '404';
+
+    switch ($codigo) {
+        case '403':
+            require __DIR__ . '/views/error/no_acceso.php';
+            break;
+
+        case '404':
+        default:
+            require __DIR__ . '/views/error/404.php';
+            break;
+    }
+    break;
+
 
     // ---------------------
     // ERROR 404
