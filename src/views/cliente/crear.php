@@ -4,11 +4,6 @@
     <form method="POST" action="/CLIENTES/GUARDAR">
 
         <div class="mb-3">
-            <label>ID Cliente</label>
-            <input type="number" name="Id_cliente" class="form-control" required>
-        </div>
-
-        <div class="mb-3">
             <label>Nombre</label>
             <input type="text" name="Nombre_cte" class="form-control" required>
         </div>
@@ -33,7 +28,7 @@
             <input type="text" name="Direccion_cte" class="form-control">
         </div>
 
-        <button class="btn btn-success">Guardar</button>
+        <button type="submit" class="btn btn-primary">Guardar</button>
         <a href="/CLIENTES" class="btn btn-secondary">Cancelar</a>
     </form>
 </div>

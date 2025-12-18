@@ -14,9 +14,20 @@
            name="stock" class="form-control mb-2"
            placeholder="Stock" required>
 
-    <input type="number" min="1"
-           name="fk_id_gama" class="form-control mb-2"
-           placeholder="Gama (opcional)">
+    <div class="mb-3">
+        <label class="form-label">Gama</label>
+        <select name="fk_id_gama" class="form-control">
+            <option value="">-- Sin gama --</option>
+            <?php foreach ($gamas as $gama): ?>
+                <option
+                    value="<?= $gama['Id_gama'] ?>"
+                    <?= (isset($_POST['fk_id_gama']) && $_POST['fk_id_gama'] == $gama['Id_gama']) ? 'selected' : '' ?>
+                >
+                    <?= htmlspecialchars($gama['Nombre_gama']) ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+    </div>
 
     <button type="submit" class="btn btn-primary">Guardar</button>
 </form>

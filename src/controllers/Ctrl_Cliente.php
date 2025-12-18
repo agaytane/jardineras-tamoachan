@@ -3,13 +3,10 @@ require_once __DIR__ . '/../models/ClienteModel.php';
 require_once __DIR__ . '/../helpers/auth.php';
 
 class ClienteController {
-    private $modelo;
+
+    private ClienteModel $modelo;
 
     public function __construct($conn) {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-
         if (!isset($_SESSION['usuario'])) {
             header("Location: /LOGIN");
             exit;
@@ -19,7 +16,7 @@ class ClienteController {
     }
 
     /* =========================
-       INDEX
+       INDEX 
     ========================== */
     public function index() {
         $ruta = "CLIENTES";
@@ -41,39 +38,36 @@ class ClienteController {
     public function crear() {
         requireRole(['ADMIN', 'GERENTE']);
 
-        // 1️⃣ Mostrar formulario
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             require __DIR__ . '/../views/cliente/crear.php';
             return;
         }
-        // 2️⃣ Procesar POST
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header("Location: /CLIENTES");
-            exit;
-        }
 
-        // 3️⃣ Validaciones
         if (
             empty($_POST['Nombre_cte']) ||
             empty($_POST['Apellido_cte']) ||
             empty($_POST['Email_cte'])
         ) {
-            die("❌ Datos inválidos");
+            $_SESSION['error'] = "❌ Datos obligatorios faltantes.";
+            header("Location: /CLIENTES/CREAR");
+            exit;
         }
 
-        // 4️⃣ Limpiar datos
         $data = [
-            'Nombre_cte'    => trim($_POST['Nombre_cte']),
-            'Apellido_cte'  => trim($_POST['Apellido_cte']),
-            'Email_cte'     => trim($_POST['Email_cte']),
-            'Telefono_cte'  => trim($_POST['Telefono_cte'] ?? ''),
-            'Direccion_cte' => trim($_POST['Direccion_cte'] ?? '')
+            'nombre_cte'    => trim($_POST['Nombre_cte']),
+            'apellido_cte'  => trim($_POST['Apellido_cte']),
+            'email_cte'     => trim($_POST['Email_cte']),
+            'telefono_cte'  => trim($_POST['Telefono_cte'] ?? ''),
+            'direccion_cte' => trim($_POST['Direccion_cte'] ?? '')
         ];
 
-        // 5️⃣ Insertar
-        $this->modelo->insertar($data);
+        try {
+            $this->modelo->insertar($data);
+            $_SESSION['exito'] = "✅ Cliente registrado correctamente.";
+        } catch (Exception $e) {
+            $_SESSION['error'] = "❌ Error al registrar cliente.";
+        }
 
-        // 6️⃣ Redirigir
         header("Location: /CLIENTES");
         exit;
     }
@@ -82,25 +76,32 @@ class ClienteController {
        EDITAR
     ========================== */
     public function editar($id = null) {
-        requireRole(['ADMIN', 'GERENTE']);
+    requireRole(['ADMIN', 'GERENTE']);
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $id = $_POST['id'] ?? null;
-        }
-
-        if (!$id) {
-            require __DIR__ . '/../views/cliente/seleccionar_editar.php';
-            return;
-        }
-
-        $cliente = $this->modelo->obtener($id);
-
-        if (!$cliente) {
-            die("❌ Cliente no encontrado");
-        }
-
-        require __DIR__ . '/../views/cliente/editar.php';
+    // 1️⃣ Si viene por POST (desde seleccionar_editar)
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $id = $_POST['id'] ?? null;
     }
+
+    // 2️⃣ Si NO hay ID → mostrar selector
+    if (!$id) {
+        $clientes = $this->modelo->listar();
+        require __DIR__ . '/../views/cliente/seleccionar_editar.php';
+        return;
+    }
+
+    // 3️⃣ Obtener cliente
+    $cliente = $this->modelo->obtener($id);
+
+    if (!$cliente) {
+        $_SESSION['error'] = "❌ Cliente no encontrado.";
+        header("Location: /CLIENTES");
+        exit;
+    }
+
+    // 5️⃣ Mostrar formulario de edición
+    require __DIR__ . '/../views/cliente/editar.php';
+}
 
     /* =========================
        ACTUALIZAR
@@ -114,17 +115,24 @@ class ClienteController {
         }
 
         if (empty($_POST['Id_cliente'])) {
-            die("❌ Datos inválidos");
+            $_SESSION['error'] = "❌ Datos inválidos.";
+            header("Location: /CLIENTES");
+            exit;
         }
 
         $data = [
-            'Id_cliente'    => (int) $_POST['Id_cliente'],
-            'Email_cte'     => trim($_POST['Email_cte']),
-            'Telefono_cte'  => trim($_POST['Telefono_cte']),
-            'Direccion_cte' => trim($_POST['Direccion_cte'])
+            'id_cliente'    => (int) $_POST['Id_cliente'],
+            'email_cte'     => trim($_POST['Email_cte']),
+            'telefono_cte'  => trim($_POST['Telefono_cte'] ?? ''),
+            'direccion_cte' => trim($_POST['Direccion_cte'] ?? '')
         ];
 
-        $this->modelo->actualizar($data);
+        try {
+            $this->modelo->actualizar($data);
+            $_SESSION['exito'] = "✅ Cliente actualizado.";
+        } catch (Exception $e) {
+            $_SESSION['error'] = "❌ Error al actualizar cliente.";
+        }
 
         header("Location: /CLIENTES");
         exit;
@@ -136,20 +144,24 @@ class ClienteController {
     public function eliminar($id = null) {
         requireRole(['ADMIN']);
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $id = $_POST['id'] ?? null;
-        }
-
         if (!$id) {
+            $clientes = $this->modelo->listar();
             require __DIR__ . '/../views/cliente/seleccionar_eliminar.php';
             return;
         }
 
         if (!$this->modelo->obtener($id)) {
-            die("❌ Cliente no encontrado");
+            $_SESSION['error'] = "❌ Cliente no encontrado.";
+            header("Location: /CLIENTES");
+            exit;
         }
 
-        $this->modelo->eliminar($id);
+        try {
+            $this->modelo->eliminar($id);
+            $_SESSION['exito'] = "✅ Cliente eliminado.";
+        } catch (Exception $e) {
+            $_SESSION['error'] = "❌ Error al eliminar cliente.";
+        }
 
         header("Location: /CLIENTES");
         exit;
