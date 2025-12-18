@@ -144,6 +144,11 @@ class ClienteController {
     public function eliminar($id = null) {
         requireRole(['ADMIN']);
 
+        // Permitir enviar ID por POST desde seleccionar_eliminar
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $id = $_POST['id'] ?? $id;
+        }
+
         if (!$id) {
             $clientes = $this->modelo->listar();
             require __DIR__ . '/../views/cliente/seleccionar_eliminar.php';

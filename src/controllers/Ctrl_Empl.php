@@ -42,6 +42,8 @@ class EmpleadoController {
         requireRole(['ADMIN', 'GERENTE']);
 
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $oficinas = $this->modelo->obtenerOficinas();
+            $puestos = ['GERENTE', 'VENTAS', 'ADMIN', 'PRACTICANTE', 'BECARIO'];
             require __DIR__ . '/../views/empleado/crear.php';
             return;
         }
@@ -60,16 +62,32 @@ class EmpleadoController {
             die("❌ Datos inválidos");
         }
 
+        $puesto = strtoupper(trim($_POST['Puesto']));
+
+        $salarioRaw = $_POST['Salario'] ?? '';
+        $salarioInput = str_replace(',', '.', $salarioRaw);
+        if ($salarioInput === '' || !is_numeric($salarioInput) || (float) $salarioInput <= 0) {
+            die("❌ Salario inválido");
+        }
+
+        // Trigger TR_VALIDAR_SALARIO exige >= 1000 para puestos distintos a practicante/becario
+        if (!in_array($puesto, ['PRACTICANTE', 'BECARIO'], true) && (float) $salarioInput < 1000) {
+            die("❌ Salario inválido (mínimo 1000 para este puesto)");
+        }
+
+        $salario = number_format((float) $salarioInput, 2, '.', '');
+
         $data = [
-            'Nombre_emp'    => trim($_POST['Nombre_emp']),
-            'Apellido_emp'  => trim($_POST['Apellido_emp']),
-            'Email_emp'     => trim($_POST['Email_emp']),
-            'Telefono_emp'  => trim($_POST['Telefono_emp'] ?? ''),
-            'Puesto'        => trim($_POST['Puesto']),
-            'Salario'       => (float) $_POST['Salario'],
-            'Nombre_jefe'   => trim($_POST['Nombre_jefe'] ?? ''),
-            'Fk_id_oficina' => (int) $_POST['Fk_id_oficina']
+         'nombre_emp'    => trim($_POST['Nombre_emp']),
+         'apellido_emp'  => trim($_POST['Apellido_emp']),
+         'email_emp'     => trim($_POST['Email_emp']),
+         'telefono_emp'  => trim($_POST['Telefono_emp'] ?? ''),
+         'puesto'        => $puesto,
+         'salario'       => $salario,
+         'nombre_jefe'   => trim($_POST['Nombre_jefe'] ?? ''),
+         'fk_id_oficina' => (int) $_POST['Fk_id_oficina']
         ];
+
 
         $this->modelo->insertar($data);
 
@@ -81,25 +99,30 @@ class EmpleadoController {
        EDITAR
     ========================== */
     public function editar($id = null) {
-        requireRole(['ADMIN', 'GERENTE']);
+    requireRole(['ADMIN', 'GERENTE']);
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $id = $_POST['id'] ?? null;
-        }
-
-        if (!$id) {
-            require __DIR__ . '/../views/empleado/seleccionar_editar.php';
-            return;
-        }
-
-        $empleado = $this->modelo->obtener($id);
-
-        if (!$empleado) {
-            die("❌ Empleado no encontrado");
-        }
-
-        require __DIR__ . '/../views/empleado/editar.php';
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $id = $_POST['id'] ?? null;
     }
+
+    if (!$id) {
+        $empleados = $this->modelo->listar();
+        require __DIR__ . '/../views/empleado/seleccionar_editar.php';
+        return;
+    }
+
+    $empleado = $this->modelo->obtener($id);
+
+    if (!$empleado) {
+        die("❌ Empleado no encontrado");
+    }
+
+    $oficinas = $this->modelo->obtenerOficinas();
+    $puestos = ['GERENTE', 'VENTAS', 'ADMIN', 'PRACTICANTE', 'BECARIO'];
+
+    require __DIR__ . '/../views/empleado/editar.php';
+}
+
 
     /* =========================
        ACTUALIZAR
@@ -116,17 +139,29 @@ class EmpleadoController {
             die("❌ Datos inválidos");
         }
 
-        $data = [
-            'Id_empleado'   => (int) $_POST['Id_empleado'],
-            'Nombre_emp'    => trim($_POST['Nombre_emp']),
-            'Apellido_emp'  => trim($_POST['Apellido_emp']),
-            'Email_emp'     => trim($_POST['Email_emp']),
-            'Telefono_emp'  => trim($_POST['Telefono_emp']),
-            'Puesto'        => trim($_POST['Puesto']),
-            'Salario'       => (float) $_POST['Salario'],
-            'Nombre_jefe'   => trim($_POST['Nombre_jefe']),
-            'Fk_id_oficina' => (int) $_POST['Fk_id_oficina']
-        ];
+                $salarioRaw = $_POST['Salario'] ?? '';
+                $salarioInput = str_replace(',', '.', $salarioRaw);
+                if ($salarioInput === '' || !is_numeric($salarioInput) || (float) $salarioInput <= 0) {
+                        die("❌ Salario inválido");
+                }
+
+                $puesto = strtoupper(trim($_POST['Puesto']));
+                if (!in_array($puesto, ['PRACTICANTE', 'BECARIO'], true) && (float) $salarioInput < 1000) {
+                        die("❌ Salario inválido (mínimo 1000 para este puesto)");
+                }
+
+                $salario = number_format((float) $salarioInput, 2, '.', '');
+
+                 $data = [
+                 'id_empleado'   => (int) $_POST['Id_empleado'],
+                    'email_emp'     => trim($_POST['Email_emp']),
+                    'telefono_emp'  => trim($_POST['Telefono_emp']),
+                    'puesto'        => $puesto,
+                                        'salario'       => $salario,
+                    'nombre_jefe'   => trim($_POST['Nombre_jefe']),
+                    'fk_id_oficina' => (int) $_POST['Fk_id_oficina']
+                ];
+
 
         $this->modelo->actualizar($data);
 
@@ -138,24 +173,26 @@ class EmpleadoController {
        ELIMINAR
     ========================== */
     public function eliminar($id = null) {
-        requireRole(['ADMIN']);
+    requireRole(['ADMIN']);
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $id = $_POST['id'] ?? null;
-        }
-
-        if (!$id) {
-            require __DIR__ . '/../views/empleado/seleccionar_eliminar.php';
-            return;
-        }
-
-        if (!$this->modelo->obtener($id)) {
-            die("❌ Empleado no encontrado");
-        }
-
-        $this->modelo->eliminar($id);
-
-        header("Location: /EMPLEADOS");
-        exit;
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $id = $_POST['id'] ?? null;
     }
+
+    if (!$id) {
+        $empleados = $this->modelo->listar();
+        require __DIR__ . '/../views/empleado/seleccionar_eliminar.php';
+        return;
+    }
+
+    if (!$this->modelo->obtener($id)) {
+        die("❌ Empleado no encontrado");
+    }
+
+    $this->modelo->eliminar($id);
+
+    header("Location: /EMPLEADOS");
+    exit;
+}
+
 }

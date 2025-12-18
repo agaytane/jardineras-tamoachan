@@ -20,29 +20,30 @@ class EmpleadoModel {
     }
 
     public function insertar($data) {
-        $stmt = $this->conn->prepare("
-            EXEC SP_INSERTAR_EMPLEADO 
-                @Nombre_emp = :nombre_emp,
-                @Apellido_emp = :apellido_emp,
-                @Email_emp = :email_emp,
-                @Telefono_emp = :telefono_emp,
-                @Puesto = :puesto,
-                @Salario = :salario,
-                @Nombre_jefe = :nombre_jefe,
-                @Fk_id_oficina = :fk_id_oficina
-        ");
-        
-        return $stmt->execute([
-            ':nombre_emp' => $data['nombre_emp'],
-            ':apellido_emp' => $data['apellido_emp'],
-            ':email_emp' => $data['email_emp'] ?? '',
-            ':telefono_emp' => $data['telefono_emp'] ?? '',
-            ':puesto' => $data['puesto'] ?? '',
-            ':salario' => $data['salario'] ?? 0,
-            ':nombre_jefe' => $data['nombre_jefe'] ?? '',
-            ':fk_id_oficina' => $data['fk_id_oficina'] ?? null
-        ]);
-    }
+    $stmt = $this->conn->prepare("
+        EXEC SP_INSERTAR_EMPLEADO 
+            @Nombre_emp = :nombre_emp,
+            @Apellido_emp = :apellido_emp,
+            @Email_emp = :email_emp,
+            @Telefono_emp = :telefono_emp,
+            @Puesto = :puesto,
+            @Salario = :salario,
+            @Nombre_jefe = :nombre_jefe,
+            @Fk_id_oficina = :fk_id_oficina
+    ");
+
+    return $stmt->execute([
+        ':nombre_emp' => $data['nombre_emp'],
+        ':apellido_emp' => $data['apellido_emp'],
+        ':email_emp' => $data['email_emp'],
+        ':telefono_emp' => $data['telefono_emp'],
+        ':puesto' => $data['puesto'],
+        ':salario' => $data['salario'],
+        ':nombre_jefe' => $data['nombre_jefe'],
+        ':fk_id_oficina' => $data['fk_id_oficina']
+    ]);
+}
+
 
     public function actualizar($data) {
         $stmt = $this->conn->prepare("

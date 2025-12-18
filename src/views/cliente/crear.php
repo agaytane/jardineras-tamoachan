@@ -1,7 +1,7 @@
 <div class="container mt-5">
     <h2 class="mb-4">Agregar Cliente</h2>
 
-    <form method="POST" action="/CLIENTES/GUARDAR">
+    <form method="POST" action="/CLIENTES/CREAR">
 
         <div class="mb-3">
             <label>Nombre</label>
