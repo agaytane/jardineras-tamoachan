@@ -5,12 +5,13 @@
     </div>
 
     <div class="tarjeta-formulario">
-        <form method="POST" action="/PEDIDOS/ACTUALIZAR">
-            <input type="hidden" name="Id_pedido" value="<?= htmlspecialchars($pedido['Id_pedido'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+        <form method="POST" action="/PEDIDOS/EDITAR">
+            <input type="hidden" name="id" value="<?= htmlspecialchars($pedido['Id_pedido'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
 
             <div class="grupo-formulario">
                 <label class="etiqueta-formulario">Fecha de Entrega</label>
-                <input type="date" name="Fecha_entrega" class="campo-formulario" value="<?= htmlspecialchars($pedido['Fecha_entrega'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+                <input type="date" name="Fecha_entrega" class="campo-formulario" value="<?= htmlspecialchars($pedido['Fecha_entrega'] ?? '', ENT_QUOTES, 'UTF-8') ?>" readonly disabled>
+                <small style="color:#666; display:block; margin-top:6px;">Se define automáticamente al marcar el estado como "Entregado".</small>
             </div>
 
             <div class="grupo-formulario">

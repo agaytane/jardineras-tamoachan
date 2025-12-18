@@ -52,7 +52,10 @@ class GamaController {
         }
 
         if (empty($_POST['Nombre_gama'])) {
-            die("❌ Datos inválidos");
+            $_SESSION['error'] = "❌ Datos inválidos.";
+            $_SESSION['detalle'] = "El nombre de la gama es requerido.";
+            header("Location: /VISTAS/RESULTADO?tipo=error&accion=CREAR&entidad=Gama&ruta=GAMA");
+            exit;
         }
 
         $data = [
@@ -61,9 +64,16 @@ class GamaController {
         ];
 
 
-        $this->modelo->insertar($data);
-
-        header("Location: /GAMA");
+        try {
+            $this->modelo->insertar($data);
+            $_SESSION['exito'] = "✅ Gama creada correctamente.";
+            header("Location: /VISTAS/RESULTADO?tipo=exito&accion=CREAR&entidad=Gama&ruta=GAMA");
+        } catch (Exception $e) {
+            $_SESSION['error'] = "❌ Error al crear gama.";
+            $_SESSION['detalle'] = $e->getMessage();
+            header("Location: /VISTAS/RESULTADO?tipo=error&accion=CREAR&entidad=Gama&ruta=GAMA");
+        }
+        exit;
         exit;
     }
 
@@ -86,7 +96,9 @@ class GamaController {
     $gama = $this->modelo->obtener($id);
 
     if (!$gama) {
-        die("❌ Gama no encontrada");
+        $_SESSION['error'] = "❌ Gama no encontrada.";
+        header("Location: /VISTAS/RESULTADO?tipo=error&accion=EDITAR&entidad=Gama&ruta=GAMA");
+        exit;
     }
 
     require __DIR__ . '/../views/gama/editar.php';
@@ -104,7 +116,10 @@ class GamaController {
         }
 
         if (empty($_POST['Id_gama'])) {
-            die("❌ Datos inválidos");
+            $_SESSION['error'] = "❌ Datos inválidos.";
+            $_SESSION['detalle'] = "Falta el identificador de la gama.";
+            header("Location: /VISTAS/RESULTADO?tipo=error&accion=EDITAR&entidad=Gama&ruta=GAMA");
+            exit;
         }
 
         $data = [
@@ -113,9 +128,16 @@ class GamaController {
             'descripcion_gama' => trim($_POST['Descripcion_gama'])
         ];
 
-        $this->modelo->actualizar($data);
-
-        header("Location: /GAMA");
+        try {
+            $this->modelo->actualizar($data);
+            $_SESSION['exito'] = "✅ Gama actualizada.";
+            header("Location: /VISTAS/RESULTADO?tipo=exito&accion=EDITAR&entidad=Gama&ruta=GAMA");
+        } catch (Exception $e) {
+            $_SESSION['error'] = "❌ Error al actualizar gama.";
+            $_SESSION['detalle'] = $e->getMessage();
+            header("Location: /VISTAS/RESULTADO?tipo=error&accion=EDITAR&entidad=Gama&ruta=GAMA");
+        }
+        exit;
         exit;
     }
 
@@ -136,12 +158,20 @@ class GamaController {
     }
 
     if (!$this->modelo->obtener($id)) {
-        die("❌ Gama no encontrada");
+        $_SESSION['error'] = "❌ Gama no encontrada.";
+        header("Location: /VISTAS/RESULTADO?tipo=error&accion=ELIMINAR&entidad=Gama&ruta=GAMA");
+        exit;
     }
 
-    $this->modelo->eliminar($id);
-
-    header("Location: /GAMA");
+    try {
+        $this->modelo->eliminar($id);
+        $_SESSION['exito'] = "✅ Gama eliminada.";
+        header("Location: /VISTAS/RESULTADO?tipo=exito&accion=ELIMINAR&entidad=Gama&ruta=GAMA");
+    } catch (Exception $e) {
+        $_SESSION['error'] = "❌ Error al eliminar gama.";
+        $_SESSION['detalle'] = $e->getMessage();
+        header("Location: /VISTAS/RESULTADO?tipo=error&accion=ELIMINAR&entidad=Gama&ruta=GAMA");
+    }
     exit;
 }
 }

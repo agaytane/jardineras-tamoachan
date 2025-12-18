@@ -12,14 +12,14 @@
                 <label class="etiqueta-formulario">
                     Nombre <span class="requerido">*</span>
                 </label>
-                <input type="text" name="Nombre_emp" class="campo-formulario" value="<?= htmlspecialchars($empleado['Nombre_emp'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
+                <input type="text" name="Nombre_emp" class="campo-formulario" value="<?= htmlspecialchars($empleado['Nombre_emp'] ?? '', ENT_QUOTES, 'UTF-8') ?>" readonly disabled>
             </div>
 
             <div class="grupo-formulario">
                 <label class="etiqueta-formulario">
                     Apellido <span class="requerido">*</span>
                 </label>
-                <input type="text" name="Apellido_emp" class="campo-formulario" value="<?= htmlspecialchars($empleado['Apellido_emp'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
+                <input type="text" name="Apellido_emp" class="campo-formulario" value="<?= htmlspecialchars($empleado['Apellido_emp'] ?? '', ENT_QUOTES, 'UTF-8') ?>" readonly disabled>
             </div>
 
             <div class="grupo-formulario">

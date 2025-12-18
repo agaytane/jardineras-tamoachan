@@ -453,6 +453,69 @@ BEGIN
 END;
 GO
 
+-- Stored procedure alternative: create order using JSON (compatible with PDO)
+CREATE OR ALTER PROCEDURE SP_CREAR_PEDIDO_JSON
+    @Fecha_pedido DATE,
+    @Fecha_prevista DATE,
+    @Estado VARCHAR(15),
+    @Comentarios VARCHAR(50),
+    @Fk_id_cliente INT,
+    @Fk_id_empleado INT,
+    @DetallesJson NVARCHAR(MAX)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    BEGIN TRY
+        BEGIN TRANSACTION;
+
+        IF NOT EXISTS (SELECT 1 FROM CLIENTE WHERE Id_cliente = @Fk_id_cliente)
+            THROW 50001, 'Cliente no existe', 1;
+
+        IF NOT EXISTS (SELECT 1 FROM EMPLEADO WHERE Id_empleado = @Fk_id_empleado)
+            THROW 50002, 'Empleado no existe', 1;
+
+        INSERT INTO PEDIDO (
+            Fecha_pedido, Fecha_prevista, Fecha_entrega,
+            Estado, Comentarios, Fk_id_cliente, Fk_id_empleado
+        )
+        VALUES (
+            @Fecha_pedido, @Fecha_prevista, NULL,
+            @Estado, @Comentarios, @Fk_id_cliente, @Fk_id_empleado
+        );
+
+        DECLARE @IdPedido INT = SCOPE_IDENTITY();
+
+        -- Insert details from JSON array [{"producto_id":..., "cantidad":...}, ...]
+        INSERT INTO DETALLE_PEDIDO (Fk_id_pedido, Fk_id_producto, Cantidad)
+        SELECT @IdPedido, ProductoId, Cantidad
+        FROM OPENJSON(@DetallesJson)
+        WITH (
+            ProductoId INT '$.producto_id',
+            Cantidad   INT '$.cantidad'
+        );
+
+        -- Decrease stock based on details
+        UPDATE P
+        SET P.Stock = P.Stock - D.Cantidad
+        FROM PRODUCTO P
+        INNER JOIN OPENJSON(@DetallesJson)
+            WITH (
+                ProductoId INT '$.producto_id',
+                Cantidad   INT '$.cantidad'
+            ) D ON P.Id_producto = D.ProductoId;
+
+        COMMIT TRANSACTION;
+
+        -- Return created Id for app usage
+        SELECT @IdPedido AS Id_pedido;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0 ROLLBACK;
+        THROW;
+    END CATCH;
+END;
+GO
+
 -- Trigger para validar salario mínimo
 CREATE TRIGGER TR_VALIDAR_SALARIO
 ON EMPLEADO

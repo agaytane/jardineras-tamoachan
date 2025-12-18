@@ -20,96 +20,55 @@ class PedidoModel {
        OBTENER PEDIDO + DETALLES
     ========================== */
     public function obtener($id) {
-        $sql = "EXEC SP_OBTENER_PEDIDO :id";
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-        $stmt->execute();
+    $sql = "EXEC SP_OBTENER_PEDIDO @Id_pedido = :id";
+    $stmt = $this->conn->prepare($sql);
+    $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+    $stmt->execute();
 
-        // Primer result set: pedido
-        $pedido = $stmt->fetch(PDO::FETCH_ASSOC);
+    $pedido = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // Segundo result set: detalles
-        $stmt->nextRowset();
-        $detalles = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        return [
-            'pedido'   => $pedido,
-            'detalles' => $detalles
-        ];
+    if (!$pedido) {
+        return null;
     }
+
+    $stmt->nextRowset();
+    $detalles = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    return [
+        'pedido'   => $pedido,
+        'detalles' => $detalles
+    ];
+}
 
     /* =========================
        CREAR PEDIDO + DETALLE
     ========================== */
     public function crearPedido($pedido, $detalles) {
-        // Creamos un table type para enviar a SP_CREAR_PEDIDO
-        $table = [];
-        foreach ($detalles as $d) {
-            $table[] = [
-                'ProductoId' => $d['producto_id'],
-                'Cantidad'   => $d['cantidad']
-            ];
-        }
-
-        // Preparar array de parámetros
-        $sql = "EXEC SP_CREAR_PEDIDO 
+        // Delegar la transacción al SP en SQL Server (compatible con PDO vía JSON)
+        $sql = "EXEC SP_CREAR_PEDIDO_JSON 
                 @Fecha_pedido=:fp,
                 @Fecha_prevista=:fv,
                 @Estado=:est,
                 @Comentarios=:com,
                 @Fk_id_cliente=:cli,
                 @Fk_id_empleado=:emp,
-                @Detalles=:det";
+                @DetallesJson=:dj";
 
         $stmt = $this->conn->prepare($sql);
-        $stmt->bindParam(':fp', $pedido['Fecha_pedido']);
-        $stmt->bindParam(':fv', $pedido['Fecha_prevista']);
+        $detallesJson = json_encode($detalles, JSON_UNESCAPED_UNICODE);
+
+        $stmt->bindParam(':fp',  $pedido['Fecha_pedido']);
+        $stmt->bindParam(':fv',  $pedido['Fecha_prevista']);
         $stmt->bindParam(':est', $pedido['Estado']);
         $stmt->bindParam(':com', $pedido['Comentarios']);
         $stmt->bindParam(':cli', $pedido['Fk_id_cliente'], PDO::PARAM_INT);
         $stmt->bindParam(':emp', $pedido['Fk_id_empleado'], PDO::PARAM_INT);
-        // Nota: PDO nativo no soporta Table Type, necesitarías SQLSRV o enviar múltiples inserciones.
-        // Para simplificar, puedes usar tu método anterior de transacción.
+        $stmt->bindParam(':dj',  $detallesJson, PDO::PARAM_STR);
 
-        // Como alternativa seguimos usando tu transacción:
-        try {
-            $this->conn->beginTransaction();
-
-            $sqlPedido = "INSERT INTO PEDIDO
-                          (Fecha_pedido, Fecha_prevista, Estado, Comentarios, Fk_id_cliente, Fk_id_empleado)
-                          VALUES (:fp, :fv, :est, :com, :cli, :emp)";
-            $stmtPedido = $this->conn->prepare($sqlPedido);
-            $stmtPedido->execute([
-                ':fp'  => $pedido['Fecha_pedido'],
-                ':fv'  => $pedido['Fecha_prevista'],
-                ':est' => $pedido['Estado'],
-                ':com' => $pedido['Comentarios'],
-                ':cli' => $pedido['Fk_id_cliente'],
-                ':emp' => $pedido['Fk_id_empleado']
-            ]);
-
-            $pedidoId = $this->conn->lastInsertId();
-
-            $sqlDetalle = "INSERT INTO DETALLE_PEDIDO
-                           (Fk_id_pedido, Fk_id_producto, Cantidad)
-                           VALUES (:ped, :prod, :cant)";
-            $stmtDetalle = $this->conn->prepare($sqlDetalle);
-
-            foreach ($detalles as $d) {
-                $stmtDetalle->execute([
-                    ':ped'  => $pedidoId,
-                    ':prod' => $d['producto_id'],
-                    ':cant' => $d['cantidad']
-                ]);
-            }
-
-            $this->conn->commit();
-            return $pedidoId;
-
-        } catch (Exception $e) {
-            $this->conn->rollBack();
-            throw $e;
-        }
+        $stmt->execute();
+        // El SP devuelve SELECT @IdPedido AS Id_pedido
+        $pedidoId = $stmt->fetchColumn();
+        return $pedidoId ?: null;
     }
 
     /* =========================
@@ -150,6 +109,24 @@ class PedidoModel {
         $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         return $stmt->execute();
+    }
+
+    /* =========================
+       ACTUALIZAR PEDIDO (Estado, Comentarios, Fecha_entrega)
+    ========================== */
+    public function actualizar($id, $data) {
+        $sql = "UPDATE PEDIDO
+                SET Estado = :est,
+                    Comentarios = :com,
+                    Fecha_entrega = :fe
+                WHERE Id_pedido = :id";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindValue(':est', $data['Estado']);
+        $stmt->bindValue(':com', $data['Comentarios']);
+        $stmt->bindValue(':fe',  $data['Fecha_entrega']);
+        $stmt->bindValue(':id',  $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->rowCount() > 0;
     }
 }
 

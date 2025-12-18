@@ -5,7 +5,7 @@
     </div>
 
     <div class="tarjeta-formulario">
-        <form method="POST" action="/PEDIDOS/GUARDAR">
+        <form method="POST" action="/PEDIDOS/CREAR">
             <div class="grupo-formulario">
                 <label class="etiqueta-formulario">
                     Fecha Prevista <span class="requerido">*</span>

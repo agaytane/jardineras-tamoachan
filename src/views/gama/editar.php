@@ -12,7 +12,8 @@
                 <label class="etiqueta-formulario">
                     Nombre <span class="requerido">*</span>
                 </label>
-                <input type="text" name="Nombre_gama" class="campo-formulario" value="<?= htmlspecialchars($gama['Nombre_gama'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
+                    <input type="text" name="Nombre_gama" class="campo-formulario" value="<?= htmlspecialchars($gama['Nombre_gama'] ?? '', ENT_QUOTES, 'UTF-8') ?>" readonly disabled>
+                    <small style="color:#666; display:block; margin-top:6px;">El nombre de la gama es inmutable en edición.</small>
             </div>
 
             <div class="grupo-formulario">

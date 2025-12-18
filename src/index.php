@@ -175,6 +175,14 @@ switch ($accion) {
                     requireRole(['ADMIN', 'VENTAS']);
                     $controller->cancelar($param);
                     break;
+                case 'EDITAR':
+                    requireRole(['ADMIN', 'VENTAS']);
+                    $controller->editar($param);
+                    break;
+                case 'ACTUALIZAR':
+                    requireRole(['ADMIN', 'GERENTE']);
+                    $controller->editar();
+                    break;
                 case 'ELIMINAR':
                     requireRole(['ADMIN']);
                     $controller->eliminar($param);
@@ -246,6 +254,37 @@ switch ($accion) {
                     break;
                 default:
                     $controller->index();
+            }
+        }
+        break;
+
+    case 'VISTAS':
+        require_once __DIR__ . '/controllers/Ctrl_Vistas.php';
+        $controller = new VistasController($conn);
+        if (!$metodo) {
+            $controller->empleadoOficinaPedidos(); // fallback
+        } else {
+            switch ($metodo) {
+                case 'RESULTADO':
+                    $controller->resultado();
+                    break;
+                case 'INFO_EMP_OFI_PED':
+                    $controller->empleadoOficinaPedidos();
+                    break;
+                case 'INFO_PED_CLIENT_EMP':
+                    $controller->pedidoClienteEmpleado();
+                    break;
+                case 'INFO_PROD_GAMA':
+                    $controller->productoGamaDetalle();
+                    break;
+                case 'INFO_DET_PED':
+                    $controller->detallePedidoInfo();
+                    break;
+                case 'INFO_CLIENT_PED_PROD':
+                    $controller->clientePedidoProductos();
+                    break;
+                default:
+                    $controller->empleadoOficinaPedidos();
             }
         }
         break;

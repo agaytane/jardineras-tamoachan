@@ -54,7 +54,8 @@ class ProductoController {
             $_POST['stock'] < 0
         ) {
             $_SESSION['error'] = "❌ Datos inválidos.";
-            header("Location: /PRODUCTOS/CREAR");
+            $_SESSION['detalle'] = "Nombre, precio y stock son requeridos y válidos.";
+            header("Location: /VISTAS/RESULTADO?tipo=error&accion=CREAR&entidad=Producto&ruta=PRODUCTOS");
             exit;
         }
 
@@ -69,11 +70,13 @@ class ProductoController {
         try {
             $this->modelo->insertar($data);
             $_SESSION['exito'] = "✅ Producto creado correctamente.";
+            header("Location: /VISTAS/RESULTADO?tipo=exito&accion=CREAR&entidad=Producto&ruta=PRODUCTOS");
         } catch (Exception $e) {
             $_SESSION['error'] = "❌ Error al crear producto.";
+            $_SESSION['detalle'] = $e->getMessage();
+            header("Location: /VISTAS/RESULTADO?tipo=error&accion=CREAR&entidad=Producto&ruta=PRODUCTOS");
         }
-
-        header("Location: /PRODUCTOS");
+        exit;
         exit;
     }
 
@@ -100,7 +103,7 @@ class ProductoController {
 
     if (!$producto) {
         $_SESSION['error'] = "❌ Producto no encontrado.";
-        header("Location: /PRODUCTOS");
+        header("Location: /VISTAS/RESULTADO?tipo=error&accion=EDITAR&entidad=Producto&ruta=PRODUCTOS");
         exit;
     }
 
@@ -129,7 +132,8 @@ class ProductoController {
             $_POST['stock'] < 0
         ) {
             $_SESSION['error'] = "❌ Datos inválidos.";
-            header("Location: /PRODUCTOS");
+            $_SESSION['detalle'] = "ID, precio y stock válidos son requeridos.";
+            header("Location: /VISTAS/RESULTADO?tipo=error&accion=EDITAR&entidad=Producto&ruta=PRODUCTOS");
             exit;
         }
 
@@ -144,11 +148,13 @@ class ProductoController {
         try {
             $this->modelo->actualizar($data);
             $_SESSION['exito'] = "✅ Producto actualizado.";
+            header("Location: /VISTAS/RESULTADO?tipo=exito&accion=EDITAR&entidad=Producto&ruta=PRODUCTOS");
         } catch (Exception $e) {
             $_SESSION['error'] = "❌ Error al actualizar.";
+            $_SESSION['detalle'] = $e->getMessage();
+            header("Location: /VISTAS/RESULTADO?tipo=error&accion=EDITAR&entidad=Producto&ruta=PRODUCTOS");
         }
-
-        header("Location: /PRODUCTOS");
+        exit;
         exit;
     }
 
@@ -174,7 +180,7 @@ public function eliminar($id = null) {
     $producto = $this->modelo->obtener($id);
     if (!$producto) {
         $_SESSION['error'] = "❌ Producto no encontrado.";
-        header("Location: /PRODUCTOS");
+        header("Location: /VISTAS/RESULTADO?tipo=error&accion=ELIMINAR&entidad=Producto&ruta=PRODUCTOS");
         exit;
     }
 
@@ -182,11 +188,12 @@ public function eliminar($id = null) {
     try {
         $this->modelo->eliminar($id);
         $_SESSION['exito'] = "✅ Producto eliminado correctamente.";
+        header("Location: /VISTAS/RESULTADO?tipo=exito&accion=ELIMINAR&entidad=Producto&ruta=PRODUCTOS");
     } catch (Exception $e) {
-        $_SESSION['error'] = "❌ Error al eliminar: " . $e->getMessage();
+        $_SESSION['error'] = "❌ Error al eliminar producto.";
+        $_SESSION['detalle'] = $e->getMessage();
+        header("Location: /VISTAS/RESULTADO?tipo=error&accion=ELIMINAR&entidad=Producto&ruta=PRODUCTOS");
     }
-
-    header("Location: /PRODUCTOS");
     exit;
 }
 

@@ -52,7 +52,10 @@ class OficinaController {
         }
 
         if (empty($_POST['Direccion']) || empty($_POST['Ciudad'])) {
-            die("❌ Datos inválidos");
+            $_SESSION['error'] = "❌ Datos inválidos.";
+            $_SESSION['detalle'] = "Dirección y ciudad son requeridas.";
+            header("Location: /VISTAS/RESULTADO?tipo=error&accion=CREAR&entidad=Oficina&ruta=OFICINAS");
+            exit;
         }
 
         $data = [
@@ -63,9 +66,16 @@ class OficinaController {
             'codigo_postal'  => trim($_POST['Codigo_postal'])
         ];
 
-        $this->modelo->insertar($data);
-
-        header("Location: /OFICINAS");
+        try {
+            $this->modelo->insertar($data);
+            $_SESSION['exito'] = "✅ Oficina creada correctamente.";
+            header("Location: /VISTAS/RESULTADO?tipo=exito&accion=CREAR&entidad=Oficina&ruta=OFICINAS");
+        } catch (Exception $e) {
+            $_SESSION['error'] = "❌ Error al crear oficina.";
+            $_SESSION['detalle'] = $e->getMessage();
+            header("Location: /VISTAS/RESULTADO?tipo=error&accion=CREAR&entidad=Oficina&ruta=OFICINAS");
+        }
+        exit;
         exit;
     }
 
@@ -88,7 +98,9 @@ class OficinaController {
     $oficina = $this->modelo->obtener($id);
 
     if (!$oficina) {
-        die("❌ Oficina no encontrada");
+        $_SESSION['error'] = "❌ Oficina no encontrada.";
+        header("Location: /VISTAS/RESULTADO?tipo=error&accion=EDITAR&entidad=Oficina&ruta=OFICINAS");
+        exit;
     }
 
     require __DIR__ . '/../views/oficina/editar.php';
@@ -107,7 +119,10 @@ class OficinaController {
         }
 
         if (empty($_POST['Id_oficina'])) {
-            die("❌ Datos inválidos");
+            $_SESSION['error'] = "❌ Datos inválidos.";
+            $_SESSION['detalle'] = "Falta el identificador de oficina.";
+            header("Location: /VISTAS/RESULTADO?tipo=error&accion=EDITAR&entidad=Oficina&ruta=OFICINAS");
+            exit;
         }
 
         $data = [
@@ -119,9 +134,16 @@ class OficinaController {
             'codigo_postal'  => trim($_POST['Codigo_postal'])
         ];
 
-        $this->modelo->actualizar($data);
-
-        header("Location: /OFICINAS");
+        try {
+            $this->modelo->actualizar($data);
+            $_SESSION['exito'] = "✅ Oficina actualizada.";
+            header("Location: /VISTAS/RESULTADO?tipo=exito&accion=EDITAR&entidad=Oficina&ruta=OFICINAS");
+        } catch (Exception $e) {
+            $_SESSION['error'] = "❌ Error al actualizar oficina.";
+            $_SESSION['detalle'] = $e->getMessage();
+            header("Location: /VISTAS/RESULTADO?tipo=error&accion=EDITAR&entidad=Oficina&ruta=OFICINAS");
+        }
+        exit;
         exit;
     }
 
@@ -142,12 +164,20 @@ class OficinaController {
     }
 
     if (!$this->modelo->obtener($id)) {
-        die("❌ Oficina no encontrada");
+        $_SESSION['error'] = "❌ Oficina no encontrada.";
+        header("Location: /VISTAS/RESULTADO?tipo=error&accion=ELIMINAR&entidad=Oficina&ruta=OFICINAS");
+        exit;
     }
 
-    $this->modelo->eliminar($id);
-
-    header("Location: /OFICINAS");
+    try {
+        $this->modelo->eliminar($id);
+        $_SESSION['exito'] = "✅ Oficina eliminada.";
+        header("Location: /VISTAS/RESULTADO?tipo=exito&accion=ELIMINAR&entidad=Oficina&ruta=OFICINAS");
+    } catch (Exception $e) {
+        $_SESSION['error'] = "❌ Error al eliminar oficina.";
+        $_SESSION['detalle'] = $e->getMessage();
+        header("Location: /VISTAS/RESULTADO?tipo=error&accion=ELIMINAR&entidad=Oficina&ruta=OFICINAS");
+    }
     exit;
 }
 

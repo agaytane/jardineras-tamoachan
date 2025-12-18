@@ -38,4 +38,29 @@ class VistasController {
         $datos = $this->model->clientePedidoProductos();
         require __DIR__ . '/../views/vistas_info/client_pd_prd.php';
     }
+
+    // Resultado genérico de operaciones (éxito / error)
+    public function resultado() {
+        $tipo = isset($_GET['tipo']) && strtolower($_GET['tipo']) === 'error' ? 'error' : 'exito';
+        $accion = $_GET['accion'] ?? 'operación';
+        $entidad = $_GET['entidad'] ?? 'Registro';
+        $ruta = $_GET['ruta'] ?? null; // Ej: CLIENTES, PRODUCTOS, PEDIDOS
+
+        $mensaje = null;
+        $detalle = null;
+        if ($tipo === 'exito' && isset($_SESSION['exito'])) {
+            $mensaje = $_SESSION['exito'];
+        }
+        if ($tipo === 'error' && isset($_SESSION['error'])) {
+            $mensaje = $_SESSION['error'];
+        }
+        if (isset($_SESSION['detalle'])) {
+            $detalle = $_SESSION['detalle'];
+        }
+
+        // Limpiar flash
+        unset($_SESSION['exito'], $_SESSION['error'], $_SESSION['detalle']);
+
+        require __DIR__ . '/../views/feedback/resultado.php';
+    }
 }

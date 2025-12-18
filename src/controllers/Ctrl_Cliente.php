@@ -49,7 +49,8 @@ class ClienteController {
             empty($_POST['Email_cte'])
         ) {
             $_SESSION['error'] = "❌ Datos obligatorios faltantes.";
-            header("Location: /CLIENTES/CREAR");
+            $_SESSION['detalle'] = "Verifique nombre, apellido y email.";
+            header("Location: /VISTAS/RESULTADO?tipo=error&accion=CREAR&entidad=Cliente&ruta=CLIENTES");
             exit;
         }
 
@@ -64,11 +65,12 @@ class ClienteController {
         try {
             $this->modelo->insertar($data);
             $_SESSION['exito'] = "✅ Cliente registrado correctamente.";
+            header("Location: /VISTAS/RESULTADO?tipo=exito&accion=CREAR&entidad=Cliente&ruta=CLIENTES");
         } catch (Exception $e) {
             $_SESSION['error'] = "❌ Error al registrar cliente.";
+            $_SESSION['detalle'] = $e->getMessage();
+            header("Location: /VISTAS/RESULTADO?tipo=error&accion=CREAR&entidad=Cliente&ruta=CLIENTES");
         }
-
-        header("Location: /CLIENTES");
         exit;
     }
 
@@ -95,7 +97,7 @@ class ClienteController {
 
     if (!$cliente) {
         $_SESSION['error'] = "❌ Cliente no encontrado.";
-        header("Location: /CLIENTES");
+        header("Location: /VISTAS/RESULTADO?tipo=error&accion=EDITAR&entidad=Cliente&ruta=CLIENTES");
         exit;
     }
 
@@ -116,7 +118,8 @@ class ClienteController {
 
         if (empty($_POST['Id_cliente'])) {
             $_SESSION['error'] = "❌ Datos inválidos.";
-            header("Location: /CLIENTES");
+            $_SESSION['detalle'] = "Falta el identificador de cliente.";
+            header("Location: /VISTAS/RESULTADO?tipo=error&accion=EDITAR&entidad=Cliente&ruta=CLIENTES");
             exit;
         }
 
@@ -130,11 +133,12 @@ class ClienteController {
         try {
             $this->modelo->actualizar($data);
             $_SESSION['exito'] = "✅ Cliente actualizado.";
+            header("Location: /VISTAS/RESULTADO?tipo=exito&accion=EDITAR&entidad=Cliente&ruta=CLIENTES");
         } catch (Exception $e) {
             $_SESSION['error'] = "❌ Error al actualizar cliente.";
+            $_SESSION['detalle'] = $e->getMessage();
+            header("Location: /VISTAS/RESULTADO?tipo=error&accion=EDITAR&entidad=Cliente&ruta=CLIENTES");
         }
-
-        header("Location: /CLIENTES");
         exit;
     }
 
@@ -157,18 +161,19 @@ class ClienteController {
 
         if (!$this->modelo->obtener($id)) {
             $_SESSION['error'] = "❌ Cliente no encontrado.";
-            header("Location: /CLIENTES");
+            header("Location: /VISTAS/RESULTADO?tipo=error&accion=ELIMINAR&entidad=Cliente&ruta=CLIENTES");
             exit;
         }
 
         try {
             $this->modelo->eliminar($id);
             $_SESSION['exito'] = "✅ Cliente eliminado.";
+            header("Location: /VISTAS/RESULTADO?tipo=exito&accion=ELIMINAR&entidad=Cliente&ruta=CLIENTES");
         } catch (Exception $e) {
             $_SESSION['error'] = "❌ Error al eliminar cliente.";
+            $_SESSION['detalle'] = $e->getMessage();
+            header("Location: /VISTAS/RESULTADO?tipo=error&accion=ELIMINAR&entidad=Cliente&ruta=CLIENTES");
         }
-
-        header("Location: /CLIENTES");
         exit;
     }
 }
