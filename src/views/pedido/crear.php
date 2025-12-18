@@ -50,7 +50,7 @@
                             <option value="">-- Seleccionar producto --</option>
                             <?php foreach ($productos as $p): ?>
                                 <option value="<?= htmlspecialchars($p['Id_producto'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
-                                    <?= htmlspecialchars($p['Nombre'] ?? '', ENT_QUOTES, 'UTF-8') ?>
+                                    <?= htmlspecialchars($p['Nombre'] ?? '', ENT_QUOTES, 'UTF-8') ?> (Stock: <?= htmlspecialchars($p['Stock'] ?? '0', ENT_QUOTES, 'UTF-8') ?>)
                                 </option>
                             <?php endforeach; ?>
                         </select>

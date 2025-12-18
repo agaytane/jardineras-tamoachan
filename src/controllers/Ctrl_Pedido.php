@@ -72,14 +72,30 @@ class PedidoController {
             ];
 
             $detalles = [];
+            $erroresStock = [];
 
             foreach ($_POST['productos'] as $i => $prod) {
                 if (!empty($prod) && (int)$_POST['cantidades'][$i] > 0) {
+                    $productoData = $this->productoModel->obtener((int)$prod);
+                    $cantidadSolicitada = (int)$_POST['cantidades'][$i];
+                    $stockDisponible = (int)($productoData['Stock'] ?? 0);
+
+                    if ($cantidadSolicitada > $stockDisponible) {
+                        $erroresStock[] = ($productoData['Nombre'] ?? 'Producto') . ": solicitado $cantidadSolicitada, disponible $stockDisponible";
+                    }
+
                     $detalles[] = [
                         'producto_id' => (int) $prod,
-                        'cantidad'    => (int) $_POST['cantidades'][$i]
+                        'cantidad'    => $cantidadSolicitada
                     ];
                 }
+            }
+
+            if (!empty($erroresStock)) {
+                $_SESSION['error'] = "❌ Stock insuficiente para algunos productos.";
+                $_SESSION['detalle'] = implode("\n", $erroresStock);
+                header("Location: /VISTAS/RESULTADO?tipo=error&accion=CREAR&entidad=Pedido&ruta=PEDIDOS");
+                exit;
             }
 
             if (empty($detalles)) {
@@ -218,5 +234,26 @@ class PedidoController {
     }
     exit;
 }
+
+    /* =========================
+       DETALLES (API JSON)
+    ========================== */
+    public function detalles($id) {
+        header('Content-Type: application/json');
+        
+        try {
+            $detalles = $this->modelo->obtenerDetalle($id);
+            echo json_encode([
+                'success' => true,
+                'detalles' => $detalles
+            ]);
+        } catch (Exception $e) {
+            echo json_encode([
+                'success' => false,
+                'error' => 'Error al cargar detalles'
+            ]);
+        }
+        exit;
+    }
 
 }

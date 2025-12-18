@@ -21,6 +21,7 @@
             <table class="tabla-jardin">
                 <thead>
                     <tr>
+                        <th style="width: 50px;">Ver</th>
                         <th style="width: 120px;">Fecha Pedido</th>
                         <th style="width: 120px;">Fecha Prevista</th>
                         <th style="width: 120px;">Fecha Entrega</th>
@@ -70,6 +71,14 @@
                         $resumenNotas = $comentarios !== '' ? mb_strimwidth($comentarios, 0, 80, '…', 'UTF-8') : '';
                     ?>
                     <tr>
+                        <td style="text-align: center;">
+                            <button onclick="toggleDetalles(<?= htmlspecialchars($p['Id_pedido'] ?? '', ENT_QUOTES, 'UTF-8') ?>)" 
+                                    class="btn-accion btn-secundario" 
+                                    style="padding: 4px 8px; font-size: 12px;" 
+                                    title="Ver detalles de productos">
+                                📋
+                            </button>
+                        </td>
                         <td><?= $fechaPedido ?></td>
                         <td><?= $fechaPrevista ?></td>
                         <td><?= $fechaEntrega ?></td>
@@ -82,6 +91,16 @@
                         <td><?= htmlspecialchars($clienteNombre, ENT_QUOTES, 'UTF-8') ?></td>
                         <td><?= htmlspecialchars($empleadoNombre, ENT_QUOTES, 'UTF-8') ?></td>
                         <td><?= htmlspecialchars($resumenNotas, ENT_QUOTES, 'UTF-8') ?></td>
+                    </tr>
+                    <tr id="detalles-<?= htmlspecialchars($p['Id_pedido'] ?? '', ENT_QUOTES, 'UTF-8') ?>" style="display: none;">
+                        <td colspan="8" style="background: #f8f9fa; padding: 20px;">
+                            <div style="max-width: 900px; margin: 0 auto;">
+                                <h4 style="margin-bottom: 15px; color: #333;">📦 Productos del Pedido #<?= htmlspecialchars($p['Id_pedido'] ?? '', ENT_QUOTES, 'UTF-8') ?></h4>
+                                <div class="detalles-productos-cargando" data-pedido="<?= htmlspecialchars($p['Id_pedido'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+                                    <p style="color: #666;">Cargando detalles...</p>
+                                </div>
+                            </div>
+                        </td>
                     </tr>
                     <?php if (!empty($comentarios)): ?>
                         <tr>
@@ -96,3 +115,71 @@
         <?php endif; ?>
     </div>
 </div>
+
+<script>
+let detallesCache = {};
+
+function toggleDetalles(pedidoId) {
+    const row = document.getElementById('detalles-' + pedidoId);
+    if (!row) return;
+
+    if (row.style.display === 'none') {
+        row.style.display = 'table-row';
+        if (!detallesCache[pedidoId]) {
+            cargarDetalles(pedidoId);
+        }
+    } else {
+        row.style.display = 'none';
+    }
+}
+
+async function cargarDetalles(pedidoId) {
+    const container = document.querySelector(`.detalles-productos-cargando[data-pedido="${pedidoId}"]`);
+    if (!container) return;
+
+    try {
+        const response = await fetch(`/PEDIDOS/DETALLES/${pedidoId}`);
+        const data = await response.json();
+
+        if (data.success && data.detalles && data.detalles.length > 0) {
+            let html = '<table style="width: 100%; border-collapse: collapse;">';
+            html += '<thead><tr style="background: #e9ecef;">';
+            html += '<th style="padding: 10px; text-align: left; border: 1px solid #dee2e6;">Producto</th>';
+            html += '<th style="padding: 10px; text-align: center; border: 1px solid #dee2e6; width: 100px;">Cantidad</th>';
+            html += '<th style="padding: 10px; text-align: right; border: 1px solid #dee2e6; width: 120px;">Precio Unit.</th>';
+            html += '<th style="padding: 10px; text-align: right; border: 1px solid #dee2e6; width: 120px;">Subtotal</th>';
+            html += '</tr></thead><tbody>';
+
+            let total = 0;
+            data.detalles.forEach(d => {
+                const subtotal = d.Cantidad * d.Precio_venta;
+                total += subtotal;
+                html += '<tr>';
+                html += `<td style="padding: 10px; border: 1px solid #dee2e6;">${escapeHtml(d.Nombre || 'N/A')}</td>`;
+                html += `<td style="padding: 10px; text-align: center; border: 1px solid #dee2e6;">${d.Cantidad}</td>`;
+                html += `<td style="padding: 10px; text-align: right; border: 1px solid #dee2e6;">$${Number(d.Precio_venta).toFixed(2)}</td>`;
+                html += `<td style="padding: 10px; text-align: right; border: 1px solid #dee2e6;">$${subtotal.toFixed(2)}</td>`;
+                html += '</tr>';
+            });
+
+            html += '<tr style="background: #f8f9fa; font-weight: bold;">';
+            html += '<td colspan="3" style="padding: 12px; text-align: right; border: 1px solid #dee2e6;">Total:</td>';
+            html += `<td style="padding: 12px; text-align: right; border: 1px solid #dee2e6;">$${total.toFixed(2)}</td>`;
+            html += '</tr>';
+            html += '</tbody></table>';
+
+            container.innerHTML = html;
+            detallesCache[pedidoId] = true;
+        } else {
+            container.innerHTML = '<p style="color: #999;">Sin productos asociados</p>';
+        }
+    } catch (error) {
+        container.innerHTML = '<p style="color: #dc3545;">Error al cargar detalles</p>';
+    }
+}
+
+function escapeHtml(text) {
+    const map = {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'};
+    return String(text).replace(/[&<>"']/g, m => map[m]);
+}
+</script>

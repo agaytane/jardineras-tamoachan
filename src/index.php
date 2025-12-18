@@ -183,6 +183,9 @@ switch ($accion) {
                     requireRole(['ADMIN', 'GERENTE']);
                     $controller->editar();
                     break;
+                case 'DETALLES':
+                    $controller->detalles($param);
+                    break;
                 case 'ELIMINAR':
                     requireRole(['ADMIN']);
                     $controller->eliminar($param);
