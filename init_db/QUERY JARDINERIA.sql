@@ -1116,21 +1116,17 @@ UPDATE dbo.USUARIOS
 SET Password = ''
 WHERE Usuario = 'ADMIN';
 
-
 -- Eliminar datos en orden correcto (debido a las FK)
 BEGIN TRANSACTION;
-
 -- 1️⃣ TABLAS HIJAS
 DELETE FROM DETALLE_PEDIDO;
 DELETE FROM PEDIDO;
-
 -- 2️⃣ TABLAS INDEPENDIENTES
 DELETE FROM PRODUCTO;
 DELETE FROM GAMA_PRODUCTO;
 DELETE FROM CLIENTE;
 DELETE FROM EMPLEADO;
 DELETE FROM OFICINA;
-
 -- 3️⃣ REINICIAR IDENTITIES
 DBCC CHECKIDENT ('OFICINA', RESEED, 10);
 DBCC CHECKIDENT ('EMPLEADO', RESEED, 10);
@@ -1138,103 +1134,8 @@ DBCC CHECKIDENT ('CLIENTE', RESEED, 10);
 DBCC CHECKIDENT ('PEDIDO', RESEED, 10);
 DBCC CHECKIDENT ('GAMA_PRODUCTO', RESEED, 10);
 DBCC CHECKIDENT ('PRODUCTO', RESEED, 10);
-
 COMMIT;
 
-
-
-/* =========================
-   1️⃣ OFICINA (IDs 11–15)
-========================= */
-INSERT INTO OFICINA (Direccion, Telefono, Ciudad, Provincia, Codigo_postal)
-VALUES
-('Av Reforma 100', '5510000001', 'CDMX', 'CDMX', '01000'),
-('Calle Juarez 45', '5510000002', 'Puebla', 'Puebla', '72000'),
-('Blvd Atlixco 200', '5510000003', 'Puebla', 'Puebla', '72100'),
-('Av Central 300', '5510000004', 'Toluca', 'EdoMex', '50000'),
-('Insurgentes Sur 500', '5510000005', 'CDMX', 'CDMX', '03100');
-GO
-select * from OFICINA;
-/* =========================
-   2️⃣ EMPLEADO (IDs 11–15)
-   Usa oficinas 11–15
-========================= */
-INSERT INTO EMPLEADO
-(Nombre_emp, Apellido_emp, Email_emp, Telefono_emp, Puesto, Salario, Nombre_jefe, Fk_id_oficina)
-VALUES
-('Pedro', 'Sanchez', 'pedro@mail.com', '5521111111', 'GERENTE', 18000.00, NULL, 11),
-('Laura', 'Torres', 'laura@mail.com', '5522222222', 'VENTAS', 12000.00, 'Pedro', 11),
-('Miguel', 'Hernandez', 'miguel@mail.com', '5523333333', 'VENTAS', 12000.00, 'Pedro', 12),
-('Sofia', 'Ruiz', 'sofia@mail.com', '5524444444', 'ADMIN', 20000.00, NULL, 13),
-('Jorge', 'Castro', 'jorge@mail.com', '5525555555', 'VENTAS', 11000.00, 'Pedro', 14);
-GO
-
-/* =========================
-   3️⃣ CLIENTE (IDs 11–15)
-========================= */
-INSERT INTO CLIENTE
-(Nombre_cte, Apellido_cte, Email_cte, Telefono_cte, Direccion_cte)
-VALUES
-('Carlos', 'Lopez', 'carlos@mail.com', '5531111111', 'Col Roma'),
-('Ana', 'Martinez', 'ana@mail.com', '5532222222', 'Col Centro'),
-('Luis', 'Gomez', 'luis@mail.com', '5533333333', 'Col Juarez'),
-('Maria', 'Perez', 'maria@mail.com', '5534444444', 'Col Del Valle'),
-('Javier', 'Ramirez', 'javier@mail.com', '5535555555', 'Col Narvarte');
-GO
-
-/* =========================
-   4️⃣ GAMA_PRODUCTO (IDs 11–15)
-========================= */
-INSERT INTO GAMA_PRODUCTO (Nombre_gama, Descripcion_gama)
-VALUES
-('Herramientas', 'Herramientas de jardinería'),
-('Plantas', 'Plantas ornamentales'),
-('Macetas', 'Macetas decorativas'),
-('Riego', 'Sistemas de riego'),
-('Sustratos', 'Tierra y fertilizantes');
-GO
-
-/* =========================
-   5️⃣ PRODUCTO (IDs 11–15)
-   Usa gamas 11–15
-========================= */
-INSERT INTO PRODUCTO
-(Nombre, Descripcion, Precio_venta, Stock, Fk_id_gama)
-VALUES
-('Pala', 'Pala de acero', 350.00, 50, 11),
-('Rosa', 'Rosa roja', 120.00, 100, 12),
-('Maceta barro', 'Maceta mediana', 200.00, 40, 13),
-('Aspersor', 'Aspersor circular', 450.00, 30, 14),
-('Abono', 'Abono orgánico', 180.00, 60, 15);
-GO
-
-/* =========================
-   6️⃣ PEDIDO (IDs 11–15)
-   Usa clientes y empleados 11–15
-========================= */
-INSERT INTO PEDIDO
-(Fecha_pedido, Fecha_prevista, Fecha_entrega, Estado, Comentarios, Fk_id_cliente, Fk_id_empleado)
-VALUES
-(GETDATE(), DATEADD(DAY, 5, GETDATE()), NULL, 'Pendiente', 'Pedido inicial', 11, 12),
-(GETDATE(), DATEADD(DAY, 3, GETDATE()), NULL, 'Pendiente', 'Entrega rápida', 12, 13),
-(GETDATE(), DATEADD(DAY, 7, GETDATE()), NULL, 'Pendiente', 'Cliente frecuente', 13, 14),
-(GETDATE(), DATEADD(DAY, 4, GETDATE()), NULL, 'Pendiente', 'Compra mayor', 14, 15),
-(GETDATE(), DATEADD(DAY, 6, GETDATE()), NULL, 'Pendiente', 'Pedido web', 15, 11);
-GO
-SELECT * FROM PEDIDO
-
-/* =========================
-   7️⃣ DETALLE_PEDIDO
-========================= */
-INSERT INTO DETALLE_PEDIDO
-(Fk_id_pedido, Fk_id_producto, Cantidad)
-VALUES
-(11, 11, 2),
-(11, 12, 5),
-(12, 13, 3),
-(13, 14, 1),
-(14, 15, 4);
-GO
 
 SET ANSI_NULLS ON
 GO
