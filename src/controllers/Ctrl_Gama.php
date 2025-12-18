@@ -56,9 +56,10 @@ class GamaController {
         }
 
         $data = [
-            'Nombre_gama'      => trim($_POST['Nombre_gama']),
-            'Descripcion_gama' => trim($_POST['Descripcion_gama'] ?? '')
+            'nombre_gama'      => trim($_POST['Nombre_gama']),
+            'descripcion_gama' => trim($_POST['Descripcion_gama'] ?? '')
         ];
+
 
         $this->modelo->insertar($data);
 
@@ -70,25 +71,26 @@ class GamaController {
        EDITAR
     ========================== */
     public function editar($id = null) {
-        requireRole(['ADMIN', 'GERENTE']);
+    requireRole(['ADMIN', 'GERENTE']);
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $id = $_POST['id'] ?? null;
-        }
-
-        if (!$id) {
-            require __DIR__ . '/../views/gama/seleccionar_editar.php';
-            return;
-        }
-
-        $gama = $this->modelo->obtener($id);
-
-        if (!$gama) {
-            die("❌ Gama no encontrada");
-        }
-
-        require __DIR__ . '/../views/gama/editar.php';
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $id = $_POST['id'] ?? null;
     }
+
+    if (!$id) {
+        $gamas = $this->modelo->listar();
+        require __DIR__ . '/../views/gama/seleccionar_editar.php';
+        return;
+    }
+
+    $gama = $this->modelo->obtener($id);
+
+    if (!$gama) {
+        die("❌ Gama no encontrada");
+    }
+
+    require __DIR__ . '/../views/gama/editar.php';
+}
 
     /* =========================
        ACTUALIZAR
@@ -106,9 +108,9 @@ class GamaController {
         }
 
         $data = [
-            'Id_gama'          => (int) $_POST['Id_gama'],
-            'Nombre_gama'      => trim($_POST['Nombre_gama']),
-            'Descripcion_gama' => trim($_POST['Descripcion_gama'])
+            'id_gama'          => (int) $_POST['Id_gama'],
+            'nombre_gama'      => trim($_POST['Nombre_gama']),
+            'descripcion_gama' => trim($_POST['Descripcion_gama'])
         ];
 
         $this->modelo->actualizar($data);
@@ -121,24 +123,25 @@ class GamaController {
        ELIMINAR
     ========================== */
     public function eliminar($id = null) {
-        requireRole(['ADMIN']);
+    requireRole(['ADMIN']);
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $id = $_POST['id'] ?? null;
-        }
-
-        if (!$id) {
-            require __DIR__ . '/../views/gama/seleccionar_eliminar.php';
-            return;
-        }
-
-        if (!$this->modelo->obtener($id)) {
-            die("❌ Gama no encontrada");
-        }
-
-        $this->modelo->eliminar($id);
-
-        header("Location: /GAMA");
-        exit;
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $id = $_POST['id'] ?? null;
     }
+
+    if (!$id) {
+        $gamas = $this->modelo->listar();
+        require __DIR__ . '/../views/gama/seleccionar_eliminar.php';
+        return;
+    }
+
+    if (!$this->modelo->obtener($id)) {
+        die("❌ Gama no encontrada");
+    }
+
+    $this->modelo->eliminar($id);
+
+    header("Location: /GAMA");
+    exit;
+}
 }

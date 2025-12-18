@@ -1,20 +1,29 @@
-<div class="container mt-5">
-    <h2 class="mb-4">Editar Empleado</h2>
+<div class="contenedor-vista">
+    <div class="encabezado-pagina">
+        <h1>✏️ Seleccionar Empleado</h1>
+        <p class="subtitulo">Elige el empleado que deseas editar</p>
+    </div>
 
-    <form action="/EMPLEADOS/EDITAR" method="POST">
-        <div class="mb-3">
-            <label>Seleccione el Empleado</label>
-            <select name="id" class="form-control" required>
-                <option value="">-- Seleccione --</option>
-                <?php foreach ($empleados as $empleado): ?>
-                    <option value="<?= $empleado['Id_empleado'] ?>">
-                        <?= htmlspecialchars(($empleado['Nombre_emp'] ?? '') . ' ' . ($empleado['Apellido_emp'] ?? ''), ENT_QUOTES, 'UTF-8') ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </div>
+    <div class="tarjeta-formulario">
+        <form action="/EMPLEADOS/EDITAR" method="POST">
+            <div class="grupo-formulario">
+                <label class="etiqueta-formulario">
+                    Empleado <span class="requerido">*</span>
+                </label>
+                <select name="id" class="select-formulario" required>
+                    <option value="">-- Seleccione un empleado --</option>
+                    <?php foreach ($empleados as $empleado): ?>
+                        <option value="<?= htmlspecialchars($empleado['Id_empleado'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+                            <?= htmlspecialchars(($empleado['Nombre_emp'] ?? '') . ' ' . ($empleado['Apellido_emp'] ?? ''), ENT_QUOTES, 'UTF-8') ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
 
-        <button class="btn btn-warning">Buscar</button>
-        <a href="/EMPLEADOS" class="btn btn-secondary">Cancelar</a>
-    </form>
+            <div class="contenedor-botones">
+                <button type="submit" class="btn-accion btn-warning">🔍 Buscar Empleado</button>
+                <a href="/EMPLEADOS" class="btn-accion btn-secundario">Cancelar</a>
+            </div>
+        </form>
+    </div>
 </div>

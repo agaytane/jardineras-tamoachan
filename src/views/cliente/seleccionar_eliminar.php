@@ -1,28 +1,42 @@
-<div class="container mt-5">
-    <h2 class="mb-4">Eliminar Cliente</h2>
+<div class="contenedor-vista">
+    <div class="encabezado-pagina">
+        <h2>⚠️ Eliminar Cliente</h2>
+    </div>
 
-    <form action="/CLIENTES/ELIMINAR" method="POST">
-        <div class="mb-3">
-            <label class="form-label">Cliente</label>
-            <?php if (!empty($clientes) && is_array($clientes)): ?>
-                <select name="id" class="form-select" required>
-                    <option value="">— Selecciona un cliente —</option>
-                    <?php foreach ($clientes as $c): ?>
-                        <option value="<?= htmlspecialchars($c['Id_cliente']) ?>">
-                            <?= htmlspecialchars($c['Id_cliente'] . ' - ' . $c['Nombre_cte'] . ' ' . $c['Apellido_cte']) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            <?php else: ?>
-                <input type="number" name="id" class="form-control" placeholder="ID del Cliente" required>
-            <?php endif; ?>
-        </div>
+    <div class="tarjeta-formulario">
+        <form method="POST" action="/CLIENTES/ELIMINAR">
+            <div class="grupo-formulario">
+                <label class="form-label">Cliente <span class="requerido">*</span></label>
+                <?php if (!empty($clientes) && is_array($clientes)): ?>
+                    <select name="id" class="select-formulario" required>
+                        <option value="">— Selecciona un cliente —</option>
+                        <?php foreach ($clientes as $c): ?>
+                            <option value="<?= htmlspecialchars($c['Id_cliente'], ENT_QUOTES, 'UTF-8') ?>">
+                                <?= htmlspecialchars($c['Nombre_cte'] . ' ' . $c['Apellido_cte'], ENT_QUOTES, 'UTF-8') ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                <?php else: ?>
+                    <p class="text-muted">No hay clientes disponibles</p>
+                <?php endif; ?>
+            </div>
 
-        <div class="alert alert-warning" role="alert">
-            Esta acción es irreversible. Confirma antes de continuar.
-        </div>
+            <div style="background: linear-gradient(135deg, #ffe6e6 0%, #f9d4d4 100%); border-left: 5px solid #ff3b30; padding: 15px 20px; border-radius: 8px; margin: 20px 0; color: #721c24;">
+                <i class="fas fa-exclamation-triangle"></i> <strong>Advertencia:</strong> Esta acción es irreversible. Una vez eliminado, no podrá recuperar los datos de este cliente.
+            </div>
 
-        <button class="btn btn-danger">Eliminar</button>
-        <a href="/CLIENTES" class="btn btn-secondary">Cancelar</a>
-    </form>
+            <div class="contenedor-botones">
+                <button type="submit" class="btn btn-accion btn-danger" onclick="return confirm('¿Estás completamente seguro? Esta acción no se puede deshacer.')">
+                    <i class="fas fa-trash"></i> Eliminar Definitivamente
+                </button>
+                <a href="/CLIENTES" class="btn btn-accion btn-secundario">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <div style="text-align: center; margin-top: 30px;">
+        <a href="/CLIENTES" class="btn btn-secundario">← Volver</a>
+    </div>
 </div>

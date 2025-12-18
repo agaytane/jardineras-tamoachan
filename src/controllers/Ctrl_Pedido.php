@@ -79,7 +79,7 @@ class PedidoController {
             }
 
             if (empty($detalles)) {
-                die("❌ El pedido debe incluir productos");
+                die(" El pedido debe incluir productos");
             }
 
             $this->modelo->crearPedido($pedido, $detalles);
@@ -88,7 +88,7 @@ class PedidoController {
             exit;
         }
 
-        // Si viene GET → mostrar formulario
+        
         $clientes  = $this->clienteModel->listar();
         $empleados = $this->empleadoModel->listar();
         $productos = $this->productoModel->listar();

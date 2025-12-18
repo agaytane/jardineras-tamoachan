@@ -1,36 +1,50 @@
-<div class="container mt-5">
-    <h2 class="mb-4">Listado de Clientes</h2>
+<div class="contenedor-vista">
+    <div class="encabezado-pagina">
+        <h2>👥 Listado de Clientes</h2>
+    </div>
 
-    <a href="/CLIENTES/CREAR" class="btn btn-success mb-3">➕ Nuevo Cliente</a>
+    <div class="tarjeta-listado">
+        <div class="encabezado-tabla">
+            <h3>Gestión de Clientes</h3>
+            <a href="/CLIENTES/CREAR" class="btn btn-success">
+                ➕ Nuevo Cliente
+            </a>
+        </div>
 
-    <table class="table table-bordered table-striped">
-        <thead class="table-dark">
-            <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Apellido</th>
-                <th>Email</th>
-                <th>Teléfono</th>
-                <th>Dirección</th>
-                <th width="180">Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-        <?php foreach ($clientes as $c): ?>
-            <tr>
-                <td><?= $c['Id_cliente'] ?></td>
-                <td><?= $c['Nombre_cte'] ?></td>
-                <td><?= $c['Apellido_cte'] ?></td>
-                <td><?= $c['Email_cte'] ?></td>
-                <td><?= $c['Telefono_cte'] ?></td>
-                <td><?= $c['Direccion_cte'] ?></td>
-                <td>
-                    <a href="/CLIENTES/EDITAR/<?= $c['Id_cliente'] ?>" class="btn btn-warning btn-sm">✏ Editar</a>
-                    <a href="/CLIENTES/ELIMINAR/<?= $c['Id_cliente'] ?>" class="btn btn-danger btn-sm"
-                       onclick="return confirm('¿Eliminar este cliente?')">🗑 Eliminar</a>
-                </td>
-            </tr>
-        <?php endforeach; ?>
-        </tbody>
-    </table>
+        <?php if (!empty($clientes)): ?>
+            <table class="tabla-jardin">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th>Email</th>
+                        <th style="width: 120px;">Teléfono</th>
+                        <th>Dirección</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <?php foreach ($clientes as $c): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($c['Nombre_cte'] ?? '', ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars($c['Apellido_cte'] ?? '', ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars($c['Email_cte'] ?? '', ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars($c['Telefono_cte'] ?? '', ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars($c['Direccion_cte'] ?? '', ENT_QUOTES, 'UTF-8') ?></td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        <?php else: ?>
+            <div style="padding: 40px; text-align: center; color: #999;">
+                <p style="font-size: 18px; margin-bottom: 20px;">📭 No hay clientes registrados</p>
+                <a href="/CLIENTES/CREAR" class="btn btn-primario">
+                    Crear Primer Cliente
+                </a>
+            </div>
+        <?php endif; ?>
+    </div>
+
+    <div style="text-align: center; margin-top: 30px;">
+        <a href="/INICIO" class="btn btn-secundario">← Volver al Inicio</a>
+    </div>
 </div>

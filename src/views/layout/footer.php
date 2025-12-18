@@ -1,16 +1,14 @@
-    </main> <!-- Cierre del contenido-principal -->
-    
-    <!-- FOOTER CON TU ESTILO -->
+        <!-- FOOTER -->
     <footer class="footer-jardin">
         <div class="container">
-            <div class="row align-items-center">
+            <div class="row align-items-center mb-4">
                 <div class="col-md-6 text-md-start text-center">
                     <p class="mb-0">
                         <i class="fas fa-copyright"></i> <?php echo date('Y'); ?> 
                         Sistema de Gestión de Jardinería
                     </p>
                 </div>
-                <div class="col-md-6 text-md-end text-center mt-md-0 mt-2">
+                <div class="col-md-6 text-md-end text-center mt-md-0 mt-3">
                     <p class="mb-0">
                         <i class="fas fa-envelope me-2"></i> contacto@jardineria.com 
                         <span class="mx-2 d-none d-md-inline">•</span>
@@ -19,9 +17,10 @@
                     </p>
                 </div>
             </div>
-            <div class="row mt-2">
+            <div class="row">
                 <div class="col-12 text-center">
-                    <p class="mb-0" style="font-size: 13px; opacity: 0.8;">
+                    <hr style="border-color: rgba(255,255,255,0.2); margin: 20px 0;">
+                    <p class="mb-0" style="font-size: 13px; opacity: 0.85; letter-spacing: 0.3px;">
                         <i class="fas fa-leaf"></i> Cultivando el futuro, un jardín a la vez
                     </p>
                 </div>
@@ -32,7 +31,7 @@
     <!-- Bootstrap JS Bundle -->
     <script src="<?php echo asset('assets/bootstrap/js/bootstrap.bundle.min.js'); ?>"></script>
     
-    <!-- jQuery (opcional) -->
+    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     
     <!-- Scripts personalizados -->
@@ -40,9 +39,8 @@
     
     <!-- Scripts adicionales -->
     <script>
-        // Activar tooltips de Bootstrap
         document.addEventListener('DOMContentLoaded', function() {
-            // Tooltips
+            // Tooltips de Bootstrap
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl);

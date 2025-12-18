@@ -1,11 +1,44 @@
-<h2>Nueva Oficina</h2>
+<div class="contenedor-vista">
+    <div class="encabezado-pagina">
+        <h1>🏢 Nueva Oficina</h1>
+        <p class="subtitulo">Registrar una nueva ubicación en el sistema</p>
+    </div>
 
-<form method="POST" action="index.php?c=oficina&a=guardar">
-    <input name="Id_oficina" class="form-control mb-2" placeholder="ID">
-    <input name="Direccion" class="form-control mb-2" placeholder="Dirección">
-    <input name="Telefono" class="form-control mb-2" placeholder="Teléfono">
-    <input name="Ciudad" class="form-control mb-2" placeholder="Ciudad">
-    <input name="Provincia" class="form-control mb-2" placeholder="Provincia">
-    <input name="Codigo_postal" class="form-control mb-2" placeholder="Código Postal">
-    <button class="btn btn-primary">Guardar</button>
-</form>
+    <div class="tarjeta-formulario">
+        <form method="POST" action="/OFICINAS/CREAR">
+            <div class="grupo-formulario">
+                <label class="etiqueta-formulario">
+                    Dirección <span class="requerido">*</span>
+                </label>
+                <input type="text" name="Direccion" class="campo-formulario" required>
+            </div>
+
+            <div class="grupo-formulario">
+                <label class="etiqueta-formulario">
+                    Ciudad <span class="requerido">*</span>
+                </label>
+                <input type="text" name="Ciudad" class="campo-formulario" required>
+            </div>
+
+            <div class="grupo-formulario">
+                <label class="etiqueta-formulario">Provincia</label>
+                <input type="text" name="Provincia" class="campo-formulario">
+            </div>
+
+            <div class="grupo-formulario">
+                <label class="etiqueta-formulario">Teléfono</label>
+                <input type="text" name="Telefono" class="campo-formulario">
+            </div>
+
+            <div class="grupo-formulario">
+                <label class="etiqueta-formulario">Código Postal</label>
+                <input type="text" name="Codigo_postal" class="campo-formulario">
+            </div>
+
+            <div class="contenedor-botones">
+                <button type="submit" class="btn-accion btn-primario">✅ Guardar Oficina</button>
+                <a href="/OFICINAS" class="btn-accion btn-secundario">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>

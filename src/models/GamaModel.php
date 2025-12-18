@@ -25,7 +25,7 @@ class GamaModel {
                 @Nombre_gama = :nombre_gama,
                 @Descripcion_gama = :descripcion_gama
         ");
-        
+
         return $stmt->execute([
             ':nombre_gama' => $data['nombre_gama'],
             ':descripcion_gama' => $data['descripcion_gama']
@@ -39,12 +39,17 @@ class GamaModel {
                 @Nombre_gama = :nombre_gama,
                 @Descripcion_gama = :descripcion_gama
         ");
-        
+
         return $stmt->execute([
             ':id_gama' => $data['id_gama'],
             ':nombre_gama' => $data['nombre_gama'],
             ':descripcion_gama' => $data['descripcion_gama']
         ]);
     }
+
+    public function eliminar($id) {
+        $stmt = $this->conn->prepare("EXEC SP_ELIMINAR_GAMA @Id_gama = :id");
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
 }
-?>

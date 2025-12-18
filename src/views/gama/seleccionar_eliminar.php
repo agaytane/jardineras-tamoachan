@@ -1,13 +1,34 @@
-<div class="container mt-5">
-    <h2 class="mb-4">Eliminar Cliente</h2>
+<div class="contenedor-vista">
+    <div class="encabezado-pagina">
+        <h1>🗑️ Eliminar Gama</h1>
+        <p class="subtitulo">Selecciona la gama que deseas eliminar</p>
+    </div>
 
-    <form action="/CLIENTES/ELIMINAR" method="POST">
-        <div class="mb-3">
-            <label>ID del Cliente</label>
-            <input type="number" name="id" class="form-control" required>
+    <div class="tarjeta-formulario">
+        <div style="background: linear-gradient(135deg, #ffe6e6 0%, #f9d4d4 100%); border-left: 5px solid #ff3b30; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+            <h3 style="color: #d32f2f; margin: 0 0 10px 0; font-size: 18px;">⚠️ Advertencia</h3>
+            <p style="color: #666; margin: 0;">Esta acción eliminará permanentemente la gama seleccionada. Esta operación no se puede deshacer.</p>
         </div>
 
-        <button class="btn btn-danger">Eliminar</button>
-        <a href="/CLIENTES" class="btn btn-secondary">Cancelar</a>
-    </form>
+        <form action="/GAMA/ELIMINAR" method="POST" onsubmit="return confirm('¿ Está completamente seguro de eliminar esta gama? Esta acción es PERMANENTE.')">
+            <div class="grupo-formulario">
+                <label class="etiqueta-formulario">
+                    Gama a eliminar <span class="requerido">*</span>
+                </label>
+                <select name="id" class="select-formulario" required>
+                    <option value="">-- Seleccione una gama --</option>
+                    <?php foreach ($gamas as $gama): ?>
+                        <option value="<?= htmlspecialchars($gama['Id_gama'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+                            <?= htmlspecialchars($gama['Nombre_gama'] ?? '', ENT_QUOTES, 'UTF-8') ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <div class="contenedor-botones">
+                <button type="submit" class="btn-accion btn-danger">🗑 Eliminar Gama</button>
+                <a href="/GAMA" class="btn-accion btn-secundario">Cancelar</a>
+            </div>
+        </form>
+    </div>
 </div>

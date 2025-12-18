@@ -1,71 +1,63 @@
-<div class="container mt-5">
-    <h2>Editar Producto</h2>
+<div class="contenedor-vista">
+    <div class="encabezado-pagina">
+        <h2>✏️ Editar Producto</h2>
+    </div>
 
-    <form action="/PRODUCTOS/ACTUALIZAR" method="POST">
+    <div class="tarjeta-formulario">
+        <form action="/PRODUCTOS/ACTUALIZAR" method="POST">
+            <input type="hidden" name="id_producto" value="<?= htmlspecialchars($producto['Id_producto'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
 
-        <input type="hidden" name="id_producto" value="<?= $producto['Id_producto'] ?>">
+            <div class="grupo-formulario">
+                <label class="form-label">ID <span class="requerido">*</span></label>
+                <input type="text" class="campo-formulario" value="<?= htmlspecialchars($producto['Id_producto'] ?? '', ENT_QUOTES, 'UTF-8') ?>" readonly disabled>
+            </div>
 
-        <div class="mb-3">
-            <label class="form-label">Nombre</label>
-            <input
-                type="text"
-                name="nombre"
-                class="form-control"
-                value="<?= htmlspecialchars($producto['Nombre']) ?>"
-                required
-            >
-        </div>
+            <div class="grupo-formulario">
+                <label class="form-label">Nombre <span class="requerido">*</span></label>
+                <input type="text" name="nombre" class="campo-formulario" value="<?= htmlspecialchars($producto['Nombre'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
+            </div>
 
-        <div class="mb-3">
-            <label class="form-label">Descripción</label>
-            <input
-                type="text"
-                name="descripcion"
-                class="form-control"
-                value="<?= htmlspecialchars($producto['Descripcion']) ?>"
-            >
-        </div>
+            <div class="grupo-formulario">
+                <label class="form-label">Descripción</label>
+                <textarea name="descripcion" class="textarea-formulario"><?= htmlspecialchars($producto['Descripcion'] ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
+            </div>
 
-        <div class="mb-3">
-            <label class="form-label">Precio</label>
-            <input
-                type="number"
-                step="0.01"
-                name="precio_venta"
-                class="form-control"
-                value="<?= $producto['Precio_venta'] ?>"
-                required
-            >
-        </div>
+            <div class="grupo-formulario">
+                <label class="form-label">Precio de Venta <span class="requerido">*</span></label>
+                <input type="number" step="0.01" name="precio_venta" class="campo-formulario" value="<?= htmlspecialchars($producto['Precio_venta'] ?? '0.00', ENT_QUOTES, 'UTF-8') ?>" required>
+            </div>
 
-        <div class="mb-3">
-            <label class="form-label">Stock</label>
-            <input
-                type="number"
-                name="stock"
-                class="form-control"
-                value="<?= $producto['Stock'] ?>"
-                required
-            >
-        </div>
+            <div class="grupo-formulario">
+                <label class="form-label">Stock <span class="requerido">*</span></label>
+                <input type="number" name="stock" class="campo-formulario" value="<?= htmlspecialchars($producto['Stock'] ?? '0', ENT_QUOTES, 'UTF-8') ?>" required>
+            </div>
 
-        <div class="mb-3">
-            <label class="form-label">Gama</label>
-            <select name="fk_id_gama" class="form-control">
-                <option value="">-- Sin gama --</option>
-                <?php foreach ($gamas as $gama): ?>
-                    <option
-                        value="<?= $gama['Id_gama'] ?>"
-                        <?= ($producto['Fk_id_gama'] == $gama['Id_gama']) ? 'selected' : '' ?>
-                    >
-                        <?= htmlspecialchars($gama['Nombre_gama']) ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </div>
+            <div class="grupo-formulario">
+                <label class="form-label">Gama de Producto</label>
+                <select name="fk_id_gama" class="select-formulario">
+                    <option value="">-- Sin gama --</option>
+                    <?php foreach ($gamas as $gama): ?>
+                        <option value="<?= htmlspecialchars($gama['Id_gama'], ENT_QUOTES, 'UTF-8') ?>"
+                            <?= ($producto['Fk_id_gama'] == $gama['Id_gama']) ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($gama['Nombre_gama'] ?? '', ENT_QUOTES, 'UTF-8') ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
 
-        <button type="submit" class="btn btn-success">✅ Guardar Cambios</button>
-        <a href="/PRODUCTOS" class="btn btn-secondary">Cancelar</a>
-    </form>
+            <div class="contenedor-botones">
+                <button type="submit" class="btn btn-accion btn-primario">
+                    <i class="fas fa-save"></i> Guardar Cambios
+                </button>
+                <a href="/PRODUCTOS" class="btn btn-accion btn-secundario">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <div style="text-align: center; margin-top: 30px;">
+        <a href="/PRODUCTOS" class="btn btn-secundario">← Volver</a>
+    </div>
 </div>
 

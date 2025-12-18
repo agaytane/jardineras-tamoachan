@@ -1,21 +1,38 @@
-<div class="container mt-5">
-    <h2>Editar Pedido</h2>
+<div class="contenedor-vista">
+    <div class="encabezado-pagina">
+        <h1>✏️ Editar Pedido</h1>
+        <p class="subtitulo">Actualizar información del pedido</p>
+    </div>
 
-    <form method="POST" action="/PEDIDOS/ACTUALIZAR">
-        <input type="hidden" name="Id_pedido" value="<?= $pedido['Id_pedido'] ?>">
+    <div class="tarjeta-formulario">
+        <form method="POST" action="/PEDIDOS/ACTUALIZAR">
+            <input type="hidden" name="Id_pedido" value="<?= htmlspecialchars($pedido['Id_pedido'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
 
-        <input type="date" name="Fecha_entrega" class="form-control mb-2"
-               value="<?= $pedido['Fecha_entrega'] ?>">
+            <div class="grupo-formulario">
+                <label class="etiqueta-formulario">Fecha de Entrega</label>
+                <input type="date" name="Fecha_entrega" class="campo-formulario" value="<?= htmlspecialchars($pedido['Fecha_entrega'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+            </div>
 
-        <select name="Estado" class="form-control mb-2">
-            <option <?= $pedido['Estado']=='Pendiente'?'selected':'' ?>>Pendiente</option>
-            <option <?= $pedido['Estado']=='Entregado'?'selected':'' ?>>Entregado</option>
-            <option <?= $pedido['Estado']=='Cancelado'?'selected':'' ?>>Cancelado</option>
-        </select>
+            <div class="grupo-formulario">
+                <label class="etiqueta-formulario">
+                    Estado <span class="requerido">*</span>
+                </label>
+                <select name="Estado" class="select-formulario" required>
+                    <option value="Pendiente" <?= ($pedido['Estado'] ?? '') == 'Pendiente' ? 'selected' : '' ?>>Pendiente</option>
+                    <option value="Entregado" <?= ($pedido['Estado'] ?? '') == 'Entregado' ? 'selected' : '' ?>>Entregado</option>
+                    <option value="Cancelado" <?= ($pedido['Estado'] ?? '') == 'Cancelado' ? 'selected' : '' ?>>Cancelado</option>
+                </select>
+            </div>
 
-        <textarea name="Comentarios" class="form-control mb-2"><?= $pedido['Comentarios'] ?></textarea>
+            <div class="grupo-formulario">
+                <label class="etiqueta-formulario">Comentarios</label>
+                <textarea name="Comentarios" class="textarea-formulario" rows="4"><?= htmlspecialchars($pedido['Comentarios'] ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
+            </div>
 
-        <button class="btn btn-primary">Actualizar</button>
-        <a href="/PEDIDOS" class="btn btn-secondary">Cancelar</a>
-    </form>
+            <div class="contenedor-botones">
+                <button type="submit" class="btn-accion btn-success">✅ Actualizar Pedido</button>
+                <a href="/PEDIDOS" class="btn-accion btn-secundario">Cancelar</a>
+            </div>
+        </form>
+    </div>
 </div>

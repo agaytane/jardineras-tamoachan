@@ -56,11 +56,11 @@ class OficinaController {
         }
 
         $data = [
-            'Direccion'      => trim($_POST['Direccion']),
-            'Telefono'       => trim($_POST['Telefono'] ?? ''),
-            'Ciudad'         => trim($_POST['Ciudad']),
-            'Provincia'      => trim($_POST['Provincia']),
-            'Codigo_postal'  => trim($_POST['Codigo_postal'])
+            'direccion'      => trim($_POST['Direccion']),
+            'telefono'       => trim($_POST['Telefono'] ?? ''),
+            'ciudad'         => trim($_POST['Ciudad']),
+            'provincia'      => trim($_POST['Provincia']),
+            'codigo_postal'  => trim($_POST['Codigo_postal'])
         ];
 
         $this->modelo->insertar($data);
@@ -73,25 +73,27 @@ class OficinaController {
        EDITAR
     ========================== */
     public function editar($id = null) {
-        requireRole(['ADMIN', 'GERENTE']);
+    requireRole(['ADMIN', 'GERENTE']);
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $id = $_POST['id'] ?? null;
-        }
-
-        if (!$id) {
-            require __DIR__ . '/../views/oficina/seleccionar_editar.php';
-            return;
-        }
-
-        $oficina = $this->modelo->obtener($id);
-
-        if (!$oficina) {
-            die("❌ Oficina no encontrada");
-        }
-
-        require __DIR__ . '/../views/oficina/editar.php';
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $id = $_POST['id'] ?? null;
     }
+
+    if (!$id) {
+        $oficinas = $this->modelo->listar();
+        require __DIR__ . '/../views/oficina/seleccionar_editar.php';
+        return;
+    }
+
+    $oficina = $this->modelo->obtener($id);
+
+    if (!$oficina) {
+        die("❌ Oficina no encontrada");
+    }
+
+    require __DIR__ . '/../views/oficina/editar.php';
+}
+
 
     /* =========================
        ACTUALIZAR
@@ -109,12 +111,12 @@ class OficinaController {
         }
 
         $data = [
-            'Id_oficina'     => (int) $_POST['Id_oficina'],
-            'Direccion'      => trim($_POST['Direccion']),
-            'Telefono'       => trim($_POST['Telefono']),
-            'Ciudad'         => trim($_POST['Ciudad']),
-            'Provincia'      => trim($_POST['Provincia']),
-            'Codigo_postal'  => trim($_POST['Codigo_postal'])
+            'id_oficina'     => (int) $_POST['Id_oficina'],
+            'direccion'      => trim($_POST['Direccion']),
+            'telefono'       => trim($_POST['Telefono']),
+            'ciudad'         => trim($_POST['Ciudad']),
+            'provincia'      => trim($_POST['Provincia']),
+            'codigo_postal'  => trim($_POST['Codigo_postal'])
         ];
 
         $this->modelo->actualizar($data);
@@ -127,24 +129,26 @@ class OficinaController {
        ELIMINAR
     ========================== */
     public function eliminar($id = null) {
-        requireRole(['ADMIN']);
+    requireRole(['ADMIN']);
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $id = $_POST['id'] ?? null;
-        }
-
-        if (!$id) {
-            require __DIR__ . '/../views/oficina/seleccionar_eliminar.php';
-            return;
-        }
-
-        if (!$this->modelo->obtener($id)) {
-            die("❌ Oficina no encontrada");
-        }
-
-        $this->modelo->eliminar($id);
-
-        header("Location: /OFICINAS");
-        exit;
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $id = $_POST['id'] ?? null;
     }
+
+    if (!$id) {
+        $oficinas = $this->modelo->listar();
+        require __DIR__ . '/../views/oficina/seleccionar_eliminar.php';
+        return;
+    }
+
+    if (!$this->modelo->obtener($id)) {
+        die("❌ Oficina no encontrada");
+    }
+
+    $this->modelo->eliminar($id);
+
+    header("Location: /OFICINAS");
+    exit;
+}
+
 }

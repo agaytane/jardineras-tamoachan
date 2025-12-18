@@ -1,14 +1,34 @@
-<div class="container mt-5">
-    <h2 class="mb-4">Editar Producto</h2>
-    <p>Ingresa el ID del producto que deseas editar:</p>
+<div class="contenedor-vista">
+    <div class="encabezado-pagina">
+        <h2>🔍 Seleccionar Producto a Editar</h2>
+    </div>
 
-    <form action="/PRODUCTOS/EDITAR" method="POST">
-        <div class="mb-3">
-            <label class="form-label">ID del Producto</label>
-            <input type="number" name="id" class="form-control" required>
-        </div>
+    <div class="tarjeta-formulario">
+        <form action="/PRODUCTOS/EDITAR" method="POST">
+            <div class="grupo-formulario">
+                <label class="form-label">Producto <span class="requerido">*</span></label>
+                <select name="id" class="select-formulario" required>
+                    <option value="">— Selecciona un producto —</option>
+                    <?php foreach ($productos as $p): ?>
+                        <option value="<?= htmlspecialchars($p['Id_producto'], ENT_QUOTES, 'UTF-8') ?>">
+                            <?= htmlspecialchars($p['Nombre'] . ' - $' . number_format($p['Precio_venta'], 2), ENT_QUOTES, 'UTF-8') ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
 
-        <button type="submit" class="btn btn-warning">✏️ Buscar Producto</button>
-        <a href="/PRODUCTOS" class="btn btn-secondary">Cancelar</a>
-    </form>
+            <div class="contenedor-botones">
+                <button type="submit" class="btn btn-accion btn-primario">
+                    <i class="fas fa-search"></i> Buscar y Editar
+                </button>
+                <a href="/PRODUCTOS" class="btn btn-accion btn-secundario">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <div style="text-align: center; margin-top: 30px;">
+        <a href="/PRODUCTOS" class="btn btn-secundario">← Volver</a>
+    </div>
 </div>

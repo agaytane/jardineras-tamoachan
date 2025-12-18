@@ -60,7 +60,7 @@ if (!function_exists('base_url')) {
     </style>
 </head>
 <body>
-    <!-- HEADER CON TU ESTILO JARDINERÍA (SIN MENÚ) -->
+    <!-- HEADER CON TU ESTILO JARDINERÍA -->
     <header class="header-jardin">
         <h1>
             <span class="logo-jardineria">🌿</span>
@@ -74,8 +74,8 @@ if (!function_exists('base_url')) {
         <?php if (isset($_SESSION['usuario'])): ?>
         <div class="user-info">
             <i class="fas fa-user-circle"></i>
-            <span class="ms-2"><?php echo htmlspecialchars($_SESSION['usuario']['nombre'] ?? 'Usuario'); ?></span>
-            <span class="badge bg-light text-primary ms-2"><?php echo $_SESSION['usuario']['rol'] ?? 'User'; ?></span>
+            <span class="ms-2"><?php echo htmlspecialchars($_SESSION['usuario']['nombre'] ?? 'Usuario', ENT_QUOTES, 'UTF-8'); ?></span>
+            <span class="badge bg-light text-primary ms-2"><?php echo htmlspecialchars($_SESSION['usuario']['rol'] ?? 'User', ENT_QUOTES, 'UTF-8'); ?></span>
             <a href="<?php echo route('LOGIN/LOGOUT'); ?>" class="btn btn-sm btn-light ms-3">
                 <i class="fas fa-sign-out-alt"></i> Salir
             </a>
