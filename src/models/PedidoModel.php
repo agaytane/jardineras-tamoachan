@@ -105,7 +105,7 @@ class PedidoModel {
        ELIMINAR PEDIDO
     ========================== */
     public function eliminar($id) {
-        $sql = "DELETE FROM PEDIDO WHERE Id_pedido=:id";
+        $sql = "EXEC SP_ELIMINAR_PEDIDO_CANCELADO @Id_pedido = :id";
         $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         return $stmt->execute();

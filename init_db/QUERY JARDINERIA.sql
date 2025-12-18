@@ -648,6 +648,42 @@ BEGIN
 END;
 GO
 
+-- PROCEDIMIENTO PARA ELIMINAR PEDIDOS CANCELADOS
+CREATE PROCEDURE SP_ELIMINAR_PEDIDO_CANCELADO
+    @Id_pedido INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    BEGIN TRY
+        BEGIN TRANSACTION;
+        
+        -- Verificar que el pedido existe
+        IF NOT EXISTS (SELECT 1 FROM PEDIDO WHERE Id_pedido = @Id_pedido)
+            THROW 50001, 'Pedido no encontrado', 1;
+            
+        -- Verificar que el pedido está cancelado
+        DECLARE @Estado VARCHAR(15);
+        SELECT @Estado = Estado FROM PEDIDO WHERE Id_pedido = @Id_pedido;
+        
+        IF @Estado != 'Cancelado'
+            THROW 50010, 'No se puede eliminar el pedido, solo se permiten pedidos cancelados', 1;
+        
+        -- Eliminar primero los detalles del pedido
+        DELETE FROM DETALLE_PEDIDO WHERE Fk_id_pedido = @Id_pedido;
+        
+        -- Eliminar el pedido
+        DELETE FROM PEDIDO WHERE Id_pedido = @Id_pedido;
+        
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+        THROW;
+    END CATCH;
+END;
+GO
+
 -- 8. VISTA PARA PRODUCTOS BAJO STOCK MÍNIMO
 CREATE VIEW VW_PRODUCTOS_BAJO_STOCK
 AS

@@ -223,13 +223,20 @@ class PedidoController {
 
     try {
         $this->modelo->eliminar($id);
-        $_SESSION['exito'] = "✅ Pedido eliminado.";
+        $_SESSION['exito'] = "✅ Pedido cancelado eliminado correctamente.";
         header("Location: /VISTAS/RESULTADO?tipo=exito&accion=ELIMINAR&entidad=Pedido&ruta=PEDIDOS");
     } catch (Exception $e) {
-        [$msg, $det] = map_pdo_error($e, 'Pedido', 'eliminar');
-        $_SESSION['error'] = $msg;
-        $count = $this->modelo->contarDetallesAsociados($id);
-        $_SESSION['detalle'] = "Tiene $count detalles asociados. Elimine los detalles antes de eliminar el pedido.";
+        $errorMsg = $e->getMessage();
+        
+        // Detectar si es el error específico de estado no cancelado
+        if (strpos($errorMsg, '50010') !== false || strpos($errorMsg, 'solo se permiten pedidos cancelados') !== false) {
+            $_SESSION['error'] = "❌ No se puede eliminar el pedido.";
+            $_SESSION['detalle'] = "Solo se pueden eliminar pedidos con estado 'Cancelado'. Primero debe cancelar el pedido.";
+        } else {
+            [$msg, $det] = map_pdo_error($e, 'Pedido', 'eliminar');
+            $_SESSION['error'] = $msg;
+            $_SESSION['detalle'] = $det ?? $errorMsg;
+        }
         header("Location: /VISTAS/RESULTADO?tipo=error&accion=ELIMINAR&entidad=Pedido&ruta=PEDIDOS");
     }
     exit;

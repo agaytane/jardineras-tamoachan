@@ -51,6 +51,13 @@ function map_pdo_error($e, $entity = 'Registro', $action = 'operación') {
         return [$userMessage, null];
     }
 
+    // Custom error: Solo pedidos cancelados (50010)
+    if ($number === 50010) {
+        $userMessage = "❌ No se puede eliminar el pedido.";
+        $detail = "Solo se pueden eliminar pedidos con estado 'Cancelado'.";
+        return [$userMessage, $detail];
+    }
+
     // Fallback generic without leaking driver internals
     return [$userMessage, null];
 }
