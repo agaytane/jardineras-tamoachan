@@ -1199,3 +1199,35 @@ VALUES
 (13, 14, 1),
 (14, 15, 4);
 GO
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- 7. PROCEDIMIENTO PARA GENERAR REPORTE DE VENTAS
+ALTER PROCEDURE [dbo].[SP_REPORTE_VENTAS]
+    @FechaInicio DATE,
+    @FechaFin DATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    SELECT 
+        P.Id_pedido,
+        P.Fecha_pedido,
+        C.Nombre_cte + ' ' + C.Apellido_cte AS Cliente,
+        E.Nombre_emp + ' ' + E.Apellido_emp AS Empleado,
+        P.Estado,
+        SUM(PR.Precio_venta * DP.Cantidad) AS Total_Venta,
+        COUNT(DISTINCT DP.Fk_id_producto) AS Cantidad_Productos
+    FROM PEDIDO P
+    INNER JOIN CLIENTE C ON P.Fk_id_cliente = C.Id_cliente
+    INNER JOIN EMPLEADO E ON P.Fk_id_empleado = E.Id_empleado
+    INNER JOIN DETALLE_PEDIDO DP ON P.Id_pedido = DP.Fk_id_pedido
+    INNER JOIN PRODUCTO PR ON DP.Fk_id_producto = PR.Id_producto
+    WHERE P.Fecha_pedido BETWEEN @FechaInicio AND @FechaFin
+    GROUP BY P.Id_pedido, P.Fecha_pedido, C.Nombre_cte, C.Apellido_cte, 
+             E.Nombre_emp, E.Apellido_emp, P.Estado
+    ORDER BY P.Fecha_pedido DESC;
+END;
