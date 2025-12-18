@@ -52,4 +52,11 @@ class GamaModel {
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         return $stmt->execute();
     }
+
+    public function contarProductosAsociados($id) {
+        $stmt = $this->conn->prepare("SELECT COUNT(*) FROM PRODUCTO WHERE Fk_id_gama = :id");
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return (int) $stmt->fetchColumn();
+    }
 }

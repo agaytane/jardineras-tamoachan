@@ -4,6 +4,7 @@ require_once __DIR__ . '/../models/ClienteModel.php';
 require_once __DIR__ . '/../models/EmpleadoModel.php';
 require_once __DIR__ . '/../models/ProductoModel.php';
 require_once __DIR__ . '/../helpers/auth.php';
+require_once __DIR__ . '/../helpers/error_helper.php';
 
 class PedidoController {
     private $modelo;
@@ -209,8 +210,10 @@ class PedidoController {
         $_SESSION['exito'] = "✅ Pedido eliminado.";
         header("Location: /VISTAS/RESULTADO?tipo=exito&accion=ELIMINAR&entidad=Pedido&ruta=PEDIDOS");
     } catch (Exception $e) {
-        $_SESSION['error'] = "❌ Error al eliminar pedido.";
-        $_SESSION['detalle'] = $e->getMessage();
+        [$msg, $det] = map_pdo_error($e, 'Pedido', 'eliminar');
+        $_SESSION['error'] = $msg;
+        $count = $this->modelo->contarDetallesAsociados($id);
+        $_SESSION['detalle'] = "Tiene $count detalles asociados. Elimine los detalles antes de eliminar el pedido.";
         header("Location: /VISTAS/RESULTADO?tipo=error&accion=ELIMINAR&entidad=Pedido&ruta=PEDIDOS");
     }
     exit;

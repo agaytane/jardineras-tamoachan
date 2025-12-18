@@ -79,5 +79,12 @@ class EmpleadoModel {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function contarPedidosAsociados($id) {
+        $stmt = $this->conn->prepare("SELECT COUNT(*) FROM PEDIDO WHERE Fk_id_empleado = :id");
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return (int) $stmt->fetchColumn();
+    }
 }
 ?>

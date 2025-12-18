@@ -60,4 +60,11 @@ class ClienteModel {
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         return $stmt->execute();
     }
+
+    public function contarPedidosAsociados($id) {
+        $stmt = $this->conn->prepare("SELECT COUNT(*) FROM PEDIDO WHERE Fk_id_cliente = :id");
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return (int) $stmt->fetchColumn();
+    }
 }

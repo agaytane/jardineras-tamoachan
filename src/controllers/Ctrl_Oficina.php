@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../models/OficinaModel.php';
 require_once __DIR__ . '/../helpers/auth.php';
+require_once __DIR__ . '/../helpers/error_helper.php';
 
 class OficinaController {
     private $modelo;
@@ -174,8 +175,10 @@ class OficinaController {
         $_SESSION['exito'] = "✅ Oficina eliminada.";
         header("Location: /VISTAS/RESULTADO?tipo=exito&accion=ELIMINAR&entidad=Oficina&ruta=OFICINAS");
     } catch (Exception $e) {
-        $_SESSION['error'] = "❌ Error al eliminar oficina.";
-        $_SESSION['detalle'] = $e->getMessage();
+        [$msg, $det] = map_pdo_error($e, 'Oficina', 'eliminar');
+        $_SESSION['error'] = $msg;
+        $count = $this->modelo->contarEmpleadosAsociados($id);
+        $_SESSION['detalle'] = "Está asociada a $count empleados. Reubique o elimine los empleados antes.";
         header("Location: /VISTAS/RESULTADO?tipo=error&accion=ELIMINAR&entidad=Oficina&ruta=OFICINAS");
     }
     exit;

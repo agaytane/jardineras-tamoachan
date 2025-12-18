@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../models/ClienteModel.php';
 require_once __DIR__ . '/../helpers/auth.php';
+require_once __DIR__ . '/../helpers/error_helper.php';
 
 class ClienteController {
 
@@ -170,8 +171,10 @@ class ClienteController {
             $_SESSION['exito'] = "✅ Cliente eliminado.";
             header("Location: /VISTAS/RESULTADO?tipo=exito&accion=ELIMINAR&entidad=Cliente&ruta=CLIENTES");
         } catch (Exception $e) {
-            $_SESSION['error'] = "❌ Error al eliminar cliente.";
-            $_SESSION['detalle'] = $e->getMessage();
+            [$msg, $det] = map_pdo_error($e, 'Cliente', 'eliminar');
+            $_SESSION['error'] = $msg;
+            $count = $this->modelo->contarPedidosAsociados($id);
+            $_SESSION['detalle'] = "Tiene $count pedidos asociados. Primero elimine o reasigne esos pedidos.";
             header("Location: /VISTAS/RESULTADO?tipo=error&accion=ELIMINAR&entidad=Cliente&ruta=CLIENTES");
         }
         exit;

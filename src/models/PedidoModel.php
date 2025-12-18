@@ -111,6 +111,13 @@ class PedidoModel {
         return $stmt->execute();
     }
 
+    public function contarDetallesAsociados($id) {
+        $stmt = $this->conn->prepare("SELECT COUNT(*) FROM DETALLE_PEDIDO WHERE Fk_id_pedido = :id");
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return (int) $stmt->fetchColumn();
+    }
+
     /* =========================
        ACTUALIZAR PEDIDO (Estado, Comentarios, Fecha_entrega)
     ========================== */

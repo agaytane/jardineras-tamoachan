@@ -64,5 +64,12 @@ class OficinaModel {
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         return $stmt->execute();
     }
+
+    public function contarEmpleadosAsociados($id) {
+        $stmt = $this->conn->prepare("SELECT COUNT(*) FROM EMPLEADO WHERE Fk_id_oficina = :id");
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return (int) $stmt->fetchColumn();
+    }
 }
 ?>

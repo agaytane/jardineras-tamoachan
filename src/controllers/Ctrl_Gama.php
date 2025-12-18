@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../models/GamaModel.php';
 require_once __DIR__ . '/../helpers/auth.php';
+require_once __DIR__ . '/../helpers/error_helper.php';
 
 class GamaController {
     private $modelo;
@@ -168,8 +169,10 @@ class GamaController {
         $_SESSION['exito'] = "✅ Gama eliminada.";
         header("Location: /VISTAS/RESULTADO?tipo=exito&accion=ELIMINAR&entidad=Gama&ruta=GAMA");
     } catch (Exception $e) {
-        $_SESSION['error'] = "❌ Error al eliminar gama.";
-        $_SESSION['detalle'] = $e->getMessage();
+        [$msg, $det] = map_pdo_error($e, 'Gama', 'eliminar');
+        $_SESSION['error'] = $msg;
+        $count = $this->modelo->contarProductosAsociados($id);
+        $_SESSION['detalle'] = "Está asociada a $count productos. Elimine o cambie la gama de esos productos.";
         header("Location: /VISTAS/RESULTADO?tipo=error&accion=ELIMINAR&entidad=Gama&ruta=GAMA");
     }
     exit;

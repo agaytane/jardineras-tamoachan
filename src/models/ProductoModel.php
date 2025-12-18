@@ -73,4 +73,11 @@ class ProductoModel {
         $stmt = $this->conn->query("SELECT * FROM VW_PRODUCTOS_BAJO_STOCK");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function contarDetallesAsociados($id) {
+        $stmt = $this->conn->prepare("SELECT COUNT(*) FROM DETALLE_PEDIDO WHERE Fk_id_producto = :id");
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return (int) $stmt->fetchColumn();
+    }
 }

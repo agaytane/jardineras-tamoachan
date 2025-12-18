@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../models/EmpleadoModel.php';
 require_once __DIR__ . '/../helpers/auth.php';
+require_once __DIR__ . '/../helpers/error_helper.php';
 
 class EmpleadoController {
     private $modelo;
@@ -229,8 +230,10 @@ class EmpleadoController {
         $_SESSION['exito'] = "✅ Empleado eliminado.";
         header("Location: /VISTAS/RESULTADO?tipo=exito&accion=ELIMINAR&entidad=Empleado&ruta=EMPLEADOS");
     } catch (Exception $e) {
-        $_SESSION['error'] = "❌ Error al eliminar empleado.";
-        $_SESSION['detalle'] = $e->getMessage();
+        [$msg, $det] = map_pdo_error($e, 'Empleado', 'eliminar');
+        $_SESSION['error'] = $msg;
+        $count = $this->modelo->contarPedidosAsociados($id);
+        $_SESSION['detalle'] = "Tiene $count pedidos asociados. Primero reasigne o atienda esos pedidos.";
         header("Location: /VISTAS/RESULTADO?tipo=error&accion=ELIMINAR&entidad=Empleado&ruta=EMPLEADOS");
     }
     exit;

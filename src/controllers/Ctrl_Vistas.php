@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../model/modelo.php';
+require_once __DIR__ . '/../models/VistasModel.php';
 
 class VistasController {
 

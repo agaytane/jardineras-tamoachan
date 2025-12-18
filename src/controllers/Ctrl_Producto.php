@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../models/ProductoModel.php';
 require_once __DIR__ . '/../helpers/auth.php';
+require_once __DIR__ . '/../helpers/error_helper.php';
 
 class ProductoController {
 
@@ -190,8 +191,10 @@ public function eliminar($id = null) {
         $_SESSION['exito'] = "✅ Producto eliminado correctamente.";
         header("Location: /VISTAS/RESULTADO?tipo=exito&accion=ELIMINAR&entidad=Producto&ruta=PRODUCTOS");
     } catch (Exception $e) {
-        $_SESSION['error'] = "❌ Error al eliminar producto.";
-        $_SESSION['detalle'] = $e->getMessage();
+        [$msg, $det] = map_pdo_error($e, 'Producto', 'eliminar');
+        $_SESSION['error'] = $msg;
+        $count = $this->modelo->contarDetallesAsociados($id);
+        $_SESSION['detalle'] = "Está asociado a $count detalles de pedidos. Primero elimine o modifique esos detalles.";
         header("Location: /VISTAS/RESULTADO?tipo=error&accion=ELIMINAR&entidad=Producto&ruta=PRODUCTOS");
     }
     exit;
