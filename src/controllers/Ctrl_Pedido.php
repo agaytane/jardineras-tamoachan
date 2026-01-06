@@ -76,12 +76,12 @@ class PedidoController {
 
             foreach ($_POST['productos'] as $i => $prod) {
                 if (!empty($prod) && (int)$_POST['cantidades'][$i] > 0) {
-                    $productoData = $this->productoModel->obtener((int)$prod);
                     $cantidadSolicitada = (int)$_POST['cantidades'][$i];
-                    $stockDisponible = (int)($productoData['Stock'] ?? 0);
-
-                    if ($cantidadSolicitada > $stockDisponible) {
-                        $erroresStock[] = ($productoData['Nombre'] ?? 'Producto') . ": solicitado $cantidadSolicitada, disponible $stockDisponible";
+                    $stock = $this->productoModel->verificarStock((int)$prod, $cantidadSolicitada);
+                    
+                    if ($stock && !$stock['Disponible']) {
+                        $productoData = $this->productoModel->obtener((int)$prod);
+                        $erroresStock[] = ($productoData['Nombre'] ?? 'Producto') . ": solicitado $cantidadSolicitada, disponible " . $stock['Stock_disponible'];
                     }
 
                     $detalles[] = [

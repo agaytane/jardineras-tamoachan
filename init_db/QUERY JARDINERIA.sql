@@ -109,18 +109,7 @@ INSERT INTO USUARIOS (Usuario, Password, Fk_id_rol, Activo)
 VALUES ('inventario', 'inv123', 4, 1);
 GO
 
---WEB PROCEDURES PARA PRODUCTO
-
-CREATE TYPE DetallePedidoType AS TABLE
-(
-    ProductoId INT,
-    Cantidad INT
-);
-GO
-
--- PROCEDIMIENTOS ALMACENADOS OPTIMIZADOS
-
--- 1. PROCEDIMIENTOS PARA PRODUCTO (Optimizados)
+-- PROCEDIMIENTOS ALMACENADOS
 GO
 CREATE PROCEDURE SP_INSERTAR_PRODUCTO
     @Nombre VARCHAR(20),
@@ -256,7 +245,7 @@ BEGIN
 END;
 GO
 
--- 2. PROCEDIMIENTOS PARA EMPLEADO (Optimizados y corregidos)
+-- PROCEDIMIENTOS PARA EMPLEADO
 CREATE PROCEDURE SP_INSERTAR_EMPLEADO
     @Nombre_emp VARCHAR(10),
     @Apellido_emp VARCHAR(10),
@@ -355,7 +344,6 @@ BEGIN
     BEGIN TRY
         BEGIN TRANSACTION;
         
-        -- Verificar si el empleado tiene pedidos asociados
         IF EXISTS (SELECT 1 FROM PEDIDO WHERE Fk_id_empleado = @Id_empleado)
             THROW 50004, 'No se puede eliminar, el empleado tiene pedidos asociados', 1;
         
@@ -420,7 +408,7 @@ BEGIN
 END;
 GO
 
--- 3. PROCEDIMIENTOS PARA PEDIDOS CON TRANSACCIONES
+-- PROCEDIMIENTOS PARA PEDIDOS
 CREATE PROCEDURE SP_CREAR_PEDIDO
     @Fecha_pedido DATE,
     @Fecha_prevista DATE,
@@ -1030,6 +1018,38 @@ BEGIN
 END;
 GO
 
+-- ELIMINAR GAMA (Con validación de integridad)
+CREATE PROCEDURE SP_ELIMINAR_GAMA
+    @Id_gama INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    BEGIN TRY
+        -- Verificar si la gama existe
+        IF NOT EXISTS (SELECT 1 FROM GAMA_PRODUCTO WHERE Id_gama = @Id_gama)
+            THROW 50001, 'Gama no encontrada', 1;
+
+        -- Verificar si tiene productos asociados
+        IF EXISTS (SELECT 1 FROM PRODUCTO WHERE Fk_id_gama = @Id_gama)
+            THROW 50007, 'No se puede eliminar la gama, tiene productos asociados', 1;
+
+        BEGIN TRANSACTION;
+
+        DELETE FROM GAMA_PRODUCTO WHERE Id_gama = @Id_gama;
+
+        IF @@ROWCOUNT = 0
+            THROW 50001, 'Error eliminando gama', 1;
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+        THROW;
+    END CATCH;
+END;
+GO
+
 -- LISTAR GAMAS
 CREATE PROCEDURE SP_LISTAR_GAMAS
 AS
@@ -1097,16 +1117,114 @@ BEGIN
 END;
 GO
 
+-- OBTENER DETALLES DE PEDIDO (JSON API)
+CREATE PROCEDURE SP_OBTENER_DETALLE_PEDIDO
+    @Id_pedido INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    BEGIN TRY
+        IF NOT EXISTS (SELECT 1 FROM PEDIDO WHERE Id_pedido = @Id_pedido)
+            THROW 50001, 'Pedido no encontrado', 1;
 
+        SELECT 
+            P.Id_pedido, 
+            P.Fecha_pedido, 
+            P.Estado,
+            PR.Nombre AS Producto, 
+            D.Cantidad, 
+            PR.Precio_venta,
+            (D.Cantidad * PR.Precio_venta) AS Subtotal
+        FROM PEDIDO P
+        INNER JOIN DETALLE_PEDIDO D ON P.Id_pedido = D.Fk_id_pedido
+        INNER JOIN PRODUCTO PR ON PR.Id_producto = D.Fk_id_producto
+        WHERE P.Id_pedido = @Id_pedido
+        ORDER BY PR.Nombre;
+    END TRY
+    BEGIN CATCH
+        THROW;
+    END CATCH;
+END;
+GO
 
-SELECT Nombre, Existencia as Mayor_Existencia
-FROM PRODUCTO
-WHERE Existencia = (SELECT MAX(Existencia) FROM PRODUCTO);
+-- ACTUALIZAR PEDIDO (Con validaciones)
+CREATE PROCEDURE SP_ACTUALIZAR_PEDIDO
+    @Id_pedido INT,
+    @Estado VARCHAR(20) = NULL,
+    @Comentarios VARCHAR(200) = NULL,
+    @Fecha_entrega DATE = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+    BEGIN TRY
+        -- Validar que el pedido existe
+        IF NOT EXISTS (SELECT 1 FROM PEDIDO WHERE Id_pedido = @Id_pedido)
+            THROW 50001, 'Pedido no encontrado', 1;
 
--- el indice capturado completo 
--- desventajas de sql server
--- vision: desarrollo de soluciones tecnologicas 
--- complemetar politicas de la empresa sanciones  
+        -- Validar estado válido si se proporciona
+        IF @Estado IS NOT NULL AND @Estado NOT IN ('Pendiente', 'Procesando', 'Enviado', 'Entregado', 'Cancelado')
+            THROW 50005, 'Estado inválido', 1;
+
+        -- No permitir cambios en pedidos ya entregados o cancelados
+        IF EXISTS (SELECT 1 FROM PEDIDO WHERE Id_pedido = @Id_pedido AND Estado IN ('Entregado', 'Cancelado'))
+            THROW 50006, 'No se puede modificar pedidos entregados o cancelados', 1;
+
+        BEGIN TRANSACTION;
+
+        UPDATE PEDIDO
+        SET 
+            Estado = ISNULL(@Estado, Estado),
+            Comentarios = ISNULL(@Comentarios, Comentarios),
+            Fecha_entrega = ISNULL(@Fecha_entrega, Fecha_entrega)
+        WHERE Id_pedido = @Id_pedido;
+
+        IF @@ROWCOUNT = 0
+            THROW 50001, 'Error actualizando pedido', 1;
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+        THROW;
+    END CATCH;
+END;
+GO
+
+-- VERIFICAR STOCK DISPONIBLE
+CREATE PROCEDURE SP_VERIFICAR_STOCK
+    @Id_producto INT,
+    @Cantidad_solicitada INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    BEGIN TRY
+        DECLARE @Stock_disponible INT;
+
+        IF NOT EXISTS (SELECT 1 FROM PRODUCTO WHERE Id_producto = @Id_producto)
+            THROW 50001, 'Producto no encontrado', 1;
+
+        SELECT @Stock_disponible = Stock FROM PRODUCTO WHERE Id_producto = @Id_producto;
+
+        SELECT 
+            @Id_producto AS Id_producto,
+            @Cantidad_solicitada AS Cantidad_solicitada,
+            @Stock_disponible AS Stock_disponible,
+            CASE 
+                WHEN @Stock_disponible >= @Cantidad_solicitada THEN 1
+                ELSE 0
+            END AS Disponible,
+            CASE 
+                WHEN @Stock_disponible < @Cantidad_solicitada THEN (@Cantidad_solicitada - @Stock_disponible)
+                ELSE 0
+            END AS Faltante;
+    END TRY
+    BEGIN CATCH
+        THROW;
+    END CATCH;
+END;
+GO
+
 -- PROCEDIMIENTOS PARA GESTIÓN DE USUARIOS
 GO
 CREATE PROCEDURE SP_LISTAR_USUARIOS
@@ -1263,34 +1381,8 @@ BEGIN
 END;
 GO
 
--- Eliminar datos en orden correcto (debido a las FK)
-BEGIN TRANSACTION;
--- 1️⃣ TABLAS HIJAS
-DELETE FROM DETALLE_PEDIDO;
-DELETE FROM PEDIDO;
--- 2️⃣ TABLAS INDEPENDIENTES
-DELETE FROM PRODUCTO;
-DELETE FROM GAMA_PRODUCTO;
-DELETE FROM CLIENTE;
-DELETE FROM EMPLEADO;
-DELETE FROM OFICINA;
--- 3️⃣ REINICIAR IDENTITIES
-DBCC CHECKIDENT ('OFICINA', RESEED, 10);
-DBCC CHECKIDENT ('EMPLEADO', RESEED, 10);
-DBCC CHECKIDENT ('CLIENTE', RESEED, 10);
-DBCC CHECKIDENT ('PEDIDO', RESEED, 10);
-DBCC CHECKIDENT ('GAMA_PRODUCTO', RESEED, 10);
-DBCC CHECKIDENT ('PRODUCTO', RESEED, 10);
-COMMIT;
-
-
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
--- 7. PROCEDIMIENTO PARA GENERAR REPORTE DE VENTAS
-ALTER PROCEDURE [dbo].[SP_REPORTE_VENTAS]
+-- PROCEDIMIENTO PARA GENERAR REPORTE DE VENTAS (OPCIONAL)
+CREATE PROCEDURE SP_REPORTE_VENTAS
     @FechaInicio DATE,
     @FechaFin DATE
 AS
@@ -1315,3 +1407,4 @@ BEGIN
              E.Nombre_emp, E.Apellido_emp, P.Estado
     ORDER BY P.Fecha_pedido DESC;
 END;
+GO

@@ -80,4 +80,12 @@ class ProductoModel {
         $stmt->execute();
         return (int) $stmt->fetchColumn();
     }
+
+    public function verificarStock($id, $cantidad) {
+        $stmt = $this->conn->prepare("EXEC SP_VERIFICAR_STOCK @Id_producto = :id, @Cantidad_solicitada = :cantidad");
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->bindParam(':cantidad', $cantidad, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
 }

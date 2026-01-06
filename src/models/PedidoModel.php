@@ -75,19 +75,10 @@ class PedidoModel {
        OBTENER DETALLE PEDIDO
     ========================== */
     public function obtenerDetalle($id) {
-        $sql = "SELECT 
-                    p.Id_pedido, p.Fecha_pedido, p.Estado,
-                    pr.Nombre AS Producto, d.Cantidad, pr.Precio_venta,
-                    (d.Cantidad * pr.Precio_venta) AS Subtotal
-                FROM PEDIDO p
-                INNER JOIN DETALLE_PEDIDO d ON p.Id_pedido = d.Fk_id_pedido
-                INNER JOIN PRODUCTO pr ON pr.Id_producto = d.Fk_id_producto
-                WHERE p.Id_pedido = :id";
-
+        $sql = "EXEC SP_OBTENER_DETALLE_PEDIDO @Id_pedido = :id";
         $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
-
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -122,16 +113,16 @@ class PedidoModel {
        ACTUALIZAR PEDIDO (Estado, Comentarios, Fecha_entrega)
     ========================== */
     public function actualizar($id, $data) {
-        $sql = "UPDATE PEDIDO
-                SET Estado = :est,
-                    Comentarios = :com,
-                    Fecha_entrega = :fe
-                WHERE Id_pedido = :id";
+        $sql = "EXEC SP_ACTUALIZAR_PEDIDO 
+                    @Id_pedido = :id,
+                    @Estado = :est,
+                    @Comentarios = :com,
+                    @Fecha_entrega = :fe";
         $stmt = $this->conn->prepare($sql);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
         $stmt->bindValue(':est', $data['Estado']);
         $stmt->bindValue(':com', $data['Comentarios']);
         $stmt->bindValue(':fe',  $data['Fecha_entrega']);
-        $stmt->bindValue(':id',  $id, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->rowCount() > 0;
     }
