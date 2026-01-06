@@ -50,6 +50,13 @@
                 <h3>Gamas de Productos</h3>
                 <p>Gestionar categorías y clasificación de productos</p>
             </a>
+            <?php if (isset($_SESSION['rol']) && $_SESSION['rol'] === 'ADMIN'): ?>
+            <a href="/USUARIOS" class="item-menu">
+                <div class="icono-menu">👥</div>
+                <h3>Usuarios</h3>
+                <p>Gestionar usuarios y permisos del sistema</p>
+            </a>
+            <?php endif; ?>
         </div>
     </div>
 

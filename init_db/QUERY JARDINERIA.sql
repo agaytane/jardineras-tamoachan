@@ -1116,6 +1116,162 @@ UPDATE dbo.USUARIOS
 SET Password = ''
 WHERE Usuario = 'ADMIN';
 
+-- PROCEDIMIENTOS PARA GESTIÓN DE USUARIOS
+GO
+CREATE PROCEDURE SP_LISTAR_USUARIOS
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT 
+        U.Id_usuario,
+        U.Usuario,
+        R.Nombre_rol,
+        R.Id_rol AS Fk_id_rol,
+        U.Activo,
+        R.Descripcion AS Descripcion_rol
+    FROM USUARIOS U
+    INNER JOIN ROLES R ON U.Fk_id_rol = R.Id_rol
+    ORDER BY U.Usuario;
+END;
+GO
+
+CREATE PROCEDURE SP_OBTENER_USUARIO
+    @Id_usuario INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT 
+        U.Id_usuario,
+        U.Usuario,
+        U.Fk_id_rol,
+        R.Nombre_rol,
+        U.Activo
+    FROM USUARIOS U
+    INNER JOIN ROLES R ON U.Fk_id_rol = R.Id_rol
+    WHERE U.Id_usuario = @Id_usuario;
+END;
+GO
+
+CREATE PROCEDURE SP_INSERTAR_USUARIO
+    @Usuario VARCHAR(20),
+    @Password VARCHAR(255),
+    @Fk_id_rol INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    BEGIN TRY
+        BEGIN TRANSACTION;
+        
+        IF EXISTS (SELECT 1 FROM USUARIOS WHERE Usuario = @Usuario)
+            THROW 50011, 'El nombre de usuario ya existe', 1;
+        
+        INSERT INTO USUARIOS (Usuario, Password, Fk_id_rol, Activo)
+        VALUES (@Usuario, @Password, @Fk_id_rol, 1);
+        
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+        THROW;
+    END CATCH;
+END;
+GO
+
+CREATE PROCEDURE SP_ACTUALIZAR_USUARIO
+    @Id_usuario INT,
+    @Fk_id_rol INT,
+    @Activo BIT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    BEGIN TRY
+        BEGIN TRANSACTION;
+        
+        UPDATE USUARIOS
+        SET Fk_id_rol = @Fk_id_rol,
+            Activo = @Activo
+        WHERE Id_usuario = @Id_usuario;
+        
+        IF @@ROWCOUNT = 0
+            THROW 50001, 'Usuario no encontrado', 1;
+            
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+        THROW;
+    END CATCH;
+END;
+GO
+
+CREATE PROCEDURE SP_CAMBIAR_PASSWORD
+    @Id_usuario INT,
+    @Password VARCHAR(255)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    BEGIN TRY
+        BEGIN TRANSACTION;
+        
+        UPDATE USUARIOS
+        SET Password = @Password
+        WHERE Id_usuario = @Id_usuario;
+        
+        IF @@ROWCOUNT = 0
+            THROW 50001, 'Usuario no encontrado', 1;
+            
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+        THROW;
+    END CATCH;
+END;
+GO
+
+CREATE PROCEDURE SP_ELIMINAR_USUARIO
+    @Id_usuario INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    BEGIN TRY
+        BEGIN TRANSACTION;
+        
+        -- No permitir eliminar si es el último admin
+        DECLARE @RolId INT;
+        SELECT @RolId = Fk_id_rol FROM USUARIOS WHERE Id_usuario = @Id_usuario;
+        
+        IF @RolId = 1 AND (SELECT COUNT(*) FROM USUARIOS WHERE Fk_id_rol = 1 AND Activo = 1) <= 1
+            THROW 50012, 'No se puede eliminar el último administrador activo', 1;
+        
+        DELETE FROM USUARIOS WHERE Id_usuario = @Id_usuario;
+        
+        IF @@ROWCOUNT = 0
+            THROW 50001, 'Usuario no encontrado', 1;
+            
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+        THROW;
+    END CATCH;
+END;
+GO
+
+CREATE PROCEDURE SP_LISTAR_ROLES
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT Id_rol, Nombre_rol, Descripcion
+    FROM ROLES
+    ORDER BY Nombre_rol;
+END;
+GO
+
 -- Eliminar datos en orden correcto (debido a las FK)
 BEGIN TRANSACTION;
 -- 1️⃣ TABLAS HIJAS

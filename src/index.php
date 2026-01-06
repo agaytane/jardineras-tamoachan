@@ -292,6 +292,43 @@ switch ($accion) {
         }
         break;
 
+    case 'USUARIOS':
+        require_once __DIR__ . '/controllers/Ctrl_Usuario.php';
+        $controller = new UsuarioController($conn);
+        if (!$metodo) {
+            $controller->index();
+        } else {
+            switch ($metodo) {
+                case 'VER':
+                    requireRole(['ADMIN']);
+                    $controller->listar();
+                    break;
+                case 'CREAR':
+                    requireRole(['ADMIN']);
+                    $controller->crear();
+                    break;
+                case 'EDITAR':
+                    requireRole(['ADMIN']);
+                    $controller->editar($param);
+                    break;
+                case 'ACTUALIZAR':
+                    requireRole(['ADMIN']);
+                    $controller->actualizar();
+                    break;
+                case 'PASSWORD':
+                    requireRole(['ADMIN']);
+                    $controller->cambiarPassword($param);
+                    break;
+                case 'ELIMINAR':
+                    requireRole(['ADMIN']);
+                    $controller->eliminar($param);
+                    break;
+                default:
+                    $controller->index();
+            }
+        }
+        break;
+
     default:
         require __DIR__ . '/views/error/404.php';
 }
