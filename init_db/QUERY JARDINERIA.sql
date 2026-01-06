@@ -69,6 +69,46 @@ CREATE TABLE DETALLE_PEDIDO(
 );
 GO
 
+-- TABLAS PARA AUTENTICACIÓN Y ROLES
+CREATE TABLE ROLES (
+    Id_rol INT PRIMARY KEY IDENTITY(1,1),
+    Nombre_rol VARCHAR(20) NOT NULL,
+    Descripcion VARCHAR(50)
+);
+GO
+
+CREATE TABLE USUARIOS (
+    Id_usuario INT PRIMARY KEY IDENTITY(1,1),
+    Usuario VARCHAR(20) NOT NULL UNIQUE,
+    Password VARCHAR(255) NOT NULL,
+    Fk_id_rol INT,
+    Activo BIT DEFAULT 1,
+    FOREIGN KEY (Fk_id_rol) REFERENCES ROLES(Id_rol)
+);
+GO
+
+-- INSERTAR ROLES
+INSERT INTO ROLES (Nombre_rol, Descripcion) VALUES
+('ADMIN', 'Acceso completo al sistema'),
+('GERENTE', 'Acceso a reportes y gestión'),
+('EMPLEADO', 'Acceso a ventas y productos'),
+('INVENTARIO', 'Solo acceso a inventario');
+GO
+
+-- INSERTAR USUARIOS POR DEFECTO
+INSERT INTO USUARIOS (Usuario, Password, Fk_id_rol, Activo)
+VALUES ('admin', 'admin123', 1, 1);
+
+INSERT INTO USUARIOS (Usuario, Password, Fk_id_rol, Activo)
+VALUES ('gerente', 'gerente123', 2, 1);
+
+INSERT INTO USUARIOS (Usuario, Password, Fk_id_rol, Activo)
+VALUES ('empleado', 'empleado123', 3, 1);
+
+INSERT INTO USUARIOS (Usuario, Password, Fk_id_rol, Activo)
+VALUES ('inventario', 'inv123', 4, 1);
+GO
+
 --WEB PROCEDURES PARA PRODUCTO
 
 CREATE TYPE DetallePedidoType AS TABLE
@@ -1067,55 +1107,6 @@ WHERE Existencia = (SELECT MAX(Existencia) FROM PRODUCTO);
 -- desventajas de sql server
 -- vision: desarrollo de soluciones tecnologicas 
 -- complemetar politicas de la empresa sanciones  
--- cuadro de roles completo
--- correccion de diseño modular login 
-
-CREATE TABLE ROLES (
- Id_rol INT PRIMARY KEY IDENTITY(1,1),
- Nombre_rol VARCHAR(20) NOT NULL,
- Descripcion VARCHAR(50)
- );
- 
-CREATE TABLE USUARIOS (
- Id_usuario INT PRIMARY KEY IDENTITY(1,1),
- Usuario VARCHAR(20) NOT NULL UNIQUE,
- Password VARCHAR(255) NOT NULL,
- Fk_id_rol INT,
- Activo BIT DEFAULT 1,
- FOREIGN KEY (Fk_id_rol) REFERENCES ROLES(Id_rol)
- );
- 
- INSERT INTO ROLES (Nombre_rol, Descripcion) VALUES
- ('ADMIN', 'Acceso completo al sistema'),
- ('GERENTE', 'Acceso a reportes y gestión'),
- ('EMPLEADO', 'Acceso a ventas y productos'),
- ('INVENTARIO', 'Solo acceso a inventario');
-
- -- Usuario ADMIN
-INSERT INTO USUARIOS (Usuario, Password, Fk_id_rol, Activo)
-VALUES ('admin', 'admin123', 1, 1);
--- Usuario GERENTE
-INSERT INTO USUARIOS (Usuario, Password, Fk_id_rol, Activo)
-VALUES ('gerente', 'gerente123', 2, 1);
--- Usuario EMPLEADO
-INSERT INTO USUARIOS (Usuario, Password, Fk_id_rol, Activo)
-VALUES ('empleado', 'empleado123', 3, 1);
--- Usuario INVENTARIO
-INSERT INTO USUARIOS (Usuario, Password, Fk_id_rol, Activo)
-VALUES ('inventario', 'inv123', 4, 1);
-
-SELECT Id_empleado, Nombre_emp, Apellido_emp
-FROM EMPLEADO;
-SELECT * FROM USUARIOS;
-
- INSERT INTO USUARIOS (Usuario, Password, Fk_id_rol, Activo)
- VALUES ('ADMIN', '$2y$10$7zLcmtGvE8oEH2E/pYjY3uW82vXfBobyi9aHpZRExJZt1lPhkvOqW', 1, 1);
- -- Password hashed for 'admin123'
-
-UPDATE dbo.USUARIOS
-SET Password = ''
-WHERE Usuario = 'ADMIN';
-
 -- PROCEDIMIENTOS PARA GESTIÓN DE USUARIOS
 GO
 CREATE PROCEDURE SP_LISTAR_USUARIOS
